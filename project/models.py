@@ -64,3 +64,23 @@ class Connection(db.Model):
     def __repr__(self):
         return '<Connection {0}>'.format(self.user)
 
+class Image(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    path = db.Column(db.String(255), index=True, unique=True)
+    change = db.Column(db.Integer)
+
+
+    def __repr__(self):
+        return '<Image {0}>'.format(self.path)
+
+class Change(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    text = db.Column(db.String(255), index=True, unique=True)
+    task = db.Column(db.Integer)
+
+
+    def __repr__(self):
+        return '<Image {0}>'.format(self.text)
+
