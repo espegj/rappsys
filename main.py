@@ -6,15 +6,15 @@
 # Uses Flask-Admin to provide an admin UI for the lists of users and roles.
 # SQLAlchemy ORM, Flask-Mail and WTForms are used in supporting roles, as well.
 
-from flask import Flask, render_template
+from flask import Flask, render_template, request, url_for, redirect, g
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.security import current_user, login_required, roles_required, roles_accepted, RoleMixin, Security, \
     SQLAlchemyUserDatastore, UserMixin, utils
-from flask_mail import Mail
+from flask_mail import Mail, Message
 from flask.ext.admin import Admin
 from flask.ext.admin.contrib import sqla
-
 from wtforms.fields import PasswordField
+import random, string
 
 # Initialize Flask and set some config values
 app = Flask(__name__)
@@ -39,17 +39,20 @@ app.config['SECURITY_PASSWORD_SALT'] = 'xxxxxxxxxxxxxxx'
 # It uses Flask-Mail behind the scenes.
 # Set mail-related config values.
 # Replace this with your own "from" address
-app.config['SECURITY_EMAIL_SENDER'] = 'no-reply@example.com'
+app.config['SECURITY_EMAIL_SENDER'] = 'webcoreconsulting@gmail.com'
 # Replace the next five lines with your own SMTP server settings
-app.config['MAIL_SERVER'] = 'email-smtp.us-west-2.amazonaws.com'
-app.config['MAIL_PORT'] = 465
-app.config['MAIL_USE_SSL'] = True
-app.config['MAIL_USERNAME'] = 'xxxxxxxxxxxxxxxxxxxx'
-app.config['MAIL_PASSWORD'] = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'webcoreconsulting@gmail.com'
+app.config['MAIL_PASSWORD'] = 'QA5-as3-MVU-5LW'
+
 
 # Initialize Flask-Mail and SQLAlchemy
 mail = Mail(app)
 db = SQLAlchemy(app)
+
+mail.init_app(app)
 
 # Create a table to support a many-to-many relationship between Users and Roles
 roles_users = db.Table(
@@ -127,6 +130,9 @@ def before_first_request():
     user_datastore.add_role_to_user('admin', 'admin')
     db.session.commit()
 
+# Generates random password
+def password_generator(size=8, chars=string.ascii_uppercase + string.digits + string.ascii_lowercase):
+    return ''.join(random.choice(chars) for _ in range(size))
 
 # Displays the home page.
 @app.route('/')
@@ -136,10 +142,56 @@ def before_first_request():
 def index():
     return render_template('index.html')
 
+
 @app.route('/test')
 @roles_accepted('end-user', 'admin')
 def test():
-    return "test"
+    for x in range(0,10):
+        print password_generator()
+    return password_generator()
+
+
+@app.route('/recovery')
+def recovery():
+    return render_template('recovery.html')
+
+
+@app.route('/recovery-password', methods=['POST'])
+def recovery_password():
+    email = request.form['email']
+    url = url_for('reset_password', email=email)
+    if user_datastore.get_user(email) != None:
+        print "Bruker finnes"
+        msg = Message("Reset password",
+                  sender="webcoreconsulting@gmail.com",
+                  recipients=[email])
+        msg.body = "Faa tilsendt nytt passord klikk paa linken. http://localhost:8080" + url
+        try:
+            mail.send(msg)
+        except:
+            print "Ikke gyldig mail"
+    else:
+        print "Bruker eksisterer ikke"
+    return redirect('/')
+
+
+@app.route('/reset_password', methods=['POST', 'GET'])
+def reset_password():
+    email = request.args.get('email')
+    user = user_datastore.get_user(email)
+    pas = password_generator()
+    user.password = encrypted_password = utils.encrypt_password(pas)
+    db.session.commit()
+    msg = Message("Nytt passord",
+                  sender="webcoreconsulting@gmail.com",
+                  recipients=[email])
+    msg.body = "Ditt nye passord er: " + pas
+    try:
+        mail.send(msg)
+    except:
+        print "Ikke gyldig mail"
+    return render_template('reset_password.html', email=email)
+
 
 # Customized User model for SQL-Admin
 class UserAdmin(sqla.ModelView):
