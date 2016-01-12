@@ -1,11 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>Flask Multiple Upload</title>
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
-
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <div class="row content">
+    <div class="col-md-12">
 <h1>{{ project }}</h1>
 
 <p>Liste over aktiviteter i dette prosjektet</p>
@@ -13,5 +10,7 @@
    {% for x in activity_list %}
     <a href="{{ url_for('activity', activity_id=x.id, activity=x.name) }}"><p>{{ x.name }}</p></a>
     {% endfor %}
-</body>
-</html>
+        </div>
+        </div>
+</div>
+{% endblock %}

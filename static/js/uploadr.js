@@ -32,6 +32,7 @@ $(document).ready(function() {
 });
 
 
+
 function doUpload() {
     $("#progress").show();
     var $progressBar   = $("#progress-bar");

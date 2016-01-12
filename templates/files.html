@@ -1,11 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>Dine endringer</title>
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
-
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <div class="row content">
+    <div class="col-md-12">
 <h1>Upload Successful!</h1>
 
 Here are the files you just uploaded. Your form data was discarded in this demo
@@ -18,6 +15,7 @@ values were submitted to the server.<p>
     <h2>{{ file }}</h2>
     <img src="{{ url_for('static', filename='uploads/{}/{}'.format(uuid, file)) }}">
 {% endfor %}
-
-</body>
-</html>
+        </div>
+        </div>
+</div>
+{% endblock %}

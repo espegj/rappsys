@@ -1,21 +1,18 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>Registrer en endring</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
-
-<h1>Registrer endringer for {{ activity }}</h1>
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <div class="row content">
+    <div class="col-md-12">
+<h1>Registrer endringer for {{ activity }}</h1><br/>
     
 <form id="upload-form" action="{{ url_for('upload') }}"  method="POST" enctype="multipart/form-data">
     <input type="hidden" name="activity_id" value="{{ activity_id }}">
 
     <strong>Beskrivelse:</strong><br>
-    <textarea rows="4" cols="40" name="textarea"></textarea><p>
+    <textarea class="form-control" rows="4" cols="40" name="textarea"></textarea><p><br/>
+    <br/>
+    <input id="file-picker1" type="file" name="file" accept="image/*" multiple><p><br/>
 
-    <strong>Bilder:</strong><br>
-    <input id="file-picker" type="file" name="file" accept="image/*" multiple><p>
 
     <fieldset id="progress" style="display: none">
         <legend>Files Progress</legend>
@@ -25,11 +22,10 @@
         </div>
     </fieldset><p>
 
-    <input type="submit" value="Lagre endringer" id="upload-button">
+    <input class="btn btn-primary" type="submit" value="Lagre endringer" id="upload-button">
 </form>
+        </div>
+        </div>
+</div>
+{% endblock %}
 
-<script type="text/javascript" src="{{ url_for('static', filename='js/jquery-2.1.1.min.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='js/uploadr.js') }}"></script>
-
-</body>
-</html>
