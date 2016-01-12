@@ -7,14 +7,17 @@
 # SQLAlchemy ORM, Flask-Mail and WTForms are used in supporting roles, as well.
 
 from flask import Flask, render_template, request, url_for, redirect, g
+
 from flask.ext.sqlalchemy import SQLAlchemy
+from sqlalchemy.orm import relationship, load_only
 from flask.ext.security import current_user, login_required, roles_required, roles_accepted, RoleMixin, Security, \
     SQLAlchemyUserDatastore, UserMixin, utils
 from flask_mail import Mail, Message
 from flask.ext.admin import Admin
 from flask.ext.admin.contrib import sqla
+from uuid import uuid4
 from wtforms.fields import PasswordField
-import random, string
+import random, string, os, json, glob
 
 # Initialize Flask and set some config values
 app = Flask(__name__)
@@ -62,6 +65,20 @@ roles_users = db.Table(
     db.Column('role_id', db.Integer(), db.ForeignKey('role.id'))
 )
 
+# Create a table to support a many-to-many relationship between Users and Projects
+projects_users = db.Table(
+    'projects_users',
+    db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
+    db.Column('project_id', db.Integer(), db.ForeignKey('project.id'))
+)
+
+# Create a table to support a many-to-many relationship between Users and Activities
+activities_users = db.Table(
+    'activities_users',
+    db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
+    db.Column('activity_id', db.Integer(), db.ForeignKey('activity.id'))
+)
+
 
 # Role class
 class Role(db.Model, RoleMixin):
@@ -96,6 +113,52 @@ class User(db.Model, UserMixin):
         secondary=roles_users,
         backref=db.backref('users', lazy='dynamic')
     )
+    projects = db.relationship(
+        'Project',
+        secondary=projects_users,
+        backref=db.backref('users', lazy='dynamic')
+    )
+    activities = db.relationship(
+        'Activity',
+        secondary=activities_users,
+        backref=db.backref('users', lazy='dynamic')
+    )
+
+
+# Project class
+class Project(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), unique=True, nullable=False)
+    description = db.Column(db.String(255), nullable=False)
+
+
+# Activity class
+class Activity(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    description = db.Column(db.String(255), nullable=False)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+    project = relationship(Project, backref='activity')
+
+
+# Change class
+class Change(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+    description = db.Column(db.String(255), nullable=False)
+    activity_id = db.Column(db.Integer, db.ForeignKey('activity.id'))
+    activity = relationship(Activity, backref='change')
+
+
+# Image class
+class Image(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+    path = db.Column(db.String(255), nullable=False)
+    change_id = db.Column(db.Integer, db.ForeignKey('change.id'))
+    change = relationship(Change, backref='image')
 
 
 # Initialize the SQLAlchemy data store and Flask-Security.
@@ -194,6 +257,111 @@ def reset_password():
     return render_template('reset_password.html', email=email)
 
 
+
+@app.route('/activities')
+@roles_accepted('end-user', 'admin')
+def activities():
+    project = request.args.get('project')
+    project_id = request.args.get('project_id')
+    user_id = current_user.id
+    activity_list = db.session.query(Activity).join(User.activities).filter(User.id == user_id).\
+        filter(Activity.project_id == project_id).all()
+    return render_template("activities.html", activity_list=activity_list, project=project)
+
+
+@app.route('/projects')
+@roles_accepted('end-user', 'admin')
+def projects():
+    user_id = current_user.id
+    project_list = db.session.query(Project).join(User.projects).filter(User.id == user_id).all()
+    return render_template("projects.html", project_list=project_list)
+
+
+@app.route('/activity')
+@roles_accepted('end-user', 'admin')
+def activity():
+    activity = request.args.get('activity')
+    activity_id = request.args.get('activity_id')
+    return render_template("activity.html", activity=activity, activity_id=activity_id)
+
+
+@app.route('/change')
+@roles_accepted('end-user', 'admin')
+def change():
+    activity = request.args.get('activity')
+    activity_id = request.args.get('activity_id')
+    return render_template("change.html", activity=activity, activity_id=activity_id)
+
+
+@app.route("/upload", methods=["POST"])
+def upload():
+    form = request.form
+
+    # Create a unique "session ID" for this particular batch of uploads.
+    upload_key = str(uuid4())
+
+    # Is the upload using Ajax, or a direct POST by the form?
+    is_ajax = False
+    if form.get("__ajax", None) == "true":
+        is_ajax = True
+
+    # Target folder for these uploads.
+    target = "static/uploads/{}".format(upload_key)
+    try:
+        os.mkdir(target)
+    except:
+        if is_ajax:
+            return ajax_response(False, "Couldn't create upload directory: {}".format(target))
+        else:
+            return "Couldn't create upload directory: {}".format(target)
+
+    activity_id = form.get('activity_id')
+    text = form.get('textarea')
+    mod = Change(description=text, activity_id=activity_id)
+    db.session.add(mod)
+    db.session.commit()
+    change_id = mod.id
+
+    for upload in request.files.getlist("file"):
+        filename = upload.filename.rsplit("/")[0]
+        destination = "/".join([target, filename])
+        upload.save(destination)
+        img = Image(path=destination, change_id=change_id)
+        db.session.add(img)
+
+    db.session.commit()
+
+    if is_ajax:
+        return ajax_response(True, upload_key)
+    else:
+        return redirect(url_for("upload_complete", uuid=upload_key))
+
+
+@app.route("/files/<uuid>")
+def upload_complete(uuid):
+    """The location we send them to at the end of the upload."""
+
+    # Get their files.
+    root = "static/uploads/{}".format(uuid)
+    if not os.path.isdir(root):
+        return "Error: UUID not found!"
+
+    files = []
+    for file in glob.glob("{}/*.*".format(root)):
+        fname = file.split(os.sep)[-1]
+        files.append(fname)
+
+    return render_template("files.html", uuid=uuid, files=files)
+
+
+def ajax_response(status, msg):
+    status_code = "ok" if status else "error"
+    return json.dumps(dict(
+        status=status_code,
+        msg=msg,
+    ))
+
+
 # Customized User model for SQL-Admin
 class UserAdmin(sqla.ModelView):
 
@@ -257,3 +425,4 @@ if __name__ == '__main__':
         port=int('8080'),
         debug=app.config['DEBUG']
     )
+
