@@ -7,6 +7,7 @@
 # SQLAlchemy ORM, Flask-Mail and WTForms are used in supporting roles, as well.
 
 from flask import Flask, render_template, request, url_for, redirect, g
+from sqlalchemy.orm import sessionmaker
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.security import current_user, login_required, roles_required, roles_accepted, RoleMixin, Security, \
     SQLAlchemyUserDatastore, UserMixin, utils
@@ -14,7 +15,7 @@ from flask_mail import Mail, Message
 from flask.ext.admin import Admin
 from flask.ext.admin.contrib import sqla
 from wtforms.fields import PasswordField
-import random, string
+import random, string, hashlib
 
 # Initialize Flask and set some config values
 app = Flask(__name__)
@@ -90,6 +91,7 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(255), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
     active = db.Column(db.Boolean())
+    recovery_password = db.Column(db.String(255))
     confirmed_at = db.Column(db.DateTime())
     roles = db.relationship(
         'Role',
@@ -145,11 +147,9 @@ def index():
 
 
 @app.route('/test')
-@roles_accepted('end-user', 'admin')
+#@roles_accepted('end-user', 'admin')
 def test():
-    for x in range(0,10):
-        print password_generator()
-    return password_generator()
+    return ""
 
 
 @app.route('/recovery')
@@ -160,38 +160,44 @@ def recovery():
 @app.route('/recovery-password', methods=['POST'])
 def recovery_password():
     email = request.form['email']
-    url = url_for('reset_password', email=email)
-    if user_datastore.get_user(email) != None:
-        print "Bruker finnes"
+    pas = password_generator()
+    enc_pas = hashlib.sha224(pas).hexdigest()
+    user = db.session.query(User).filter(User.email == email).first()
+
+    if user != None:
+        user.recovery_password = enc_pas
+        db.session.commit()
         msg = Message("Reset password",
                   sender="webcoreconsulting@gmail.com",
                   recipients=[email])
-        msg.body = "Faa tilsendt nytt passord klikk paa linken. http://localhost:8080" + url
+        msg.body = "Bruk dette passordet faar aa opprette et nytt: " + pas
         try:
             mail.send(msg)
+            return render_template('set_new_pass.html')
         except:
-            print "Ikke gyldig mail"
+            return "Ikke gyldig mail"
     else:
-        print "Bruker eksisterer ikke"
-    return redirect('/')
+        db.session.close()
+        return "Bruker eksisterer ikke"
 
 
-@app.route('/reset_password', methods=['POST', 'GET'])
-def reset_password():
-    email = request.args.get('email')
-    user = user_datastore.get_user(email)
-    pas = password_generator()
-    user.password = encrypted_password = utils.encrypt_password(pas)
-    db.session.commit()
-    msg = Message("Nytt passord",
-                  sender="webcoreconsulting@gmail.com",
-                  recipients=[email])
-    msg.body = "Ditt nye passord er: " + pas
-    try:
-        mail.send(msg)
-    except:
-        print "Ikke gyldig mail"
-    return render_template('reset_password.html', email=email)
+
+@app.route('/set_new_password', methods=['POST'])
+def set_new_password():
+    email = request.form['email']
+    pas = hashlib.sha224(request.form['pas']).hexdigest()
+    new_pas = utils.encrypt_password(request.form['new_pas'])
+    user = db.session.query(User).filter(User.email == email).first()
+    print pas
+    print user.recovery_password
+    if user != None and pas == user.recovery_password and new_pas != None:
+        user.password = new_pas
+        user.recovery_password = None
+        db.session.commit()
+        return "Passord endret"
+    else:
+        return "feil.."
+
 
 
 # Customized User model for SQL-Admin

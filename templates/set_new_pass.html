@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+Sett nytt passord
+    <form action="set_new_password" method="Post">
+        <input type="email" placeholder="Email" name="email" class="form-control" id="email">
+        <input type="text" placeholder="Passord mottatt på mail" name="pas" class="form-control" id="pas">
+        <input type="password" placeholder="Nytt passord" name="new_pas" class="form-control" id="new_pas">
+        <button type="submit" value="submit" class="btn btn-default">Submit</button>
+    </form>
+{% endblock %}
