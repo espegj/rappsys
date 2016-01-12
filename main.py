@@ -125,6 +125,9 @@ class User(db.Model, UserMixin):
         backref=db.backref('users', lazy='dynamic')
     )
 
+    def __str__(self):
+        return self.email
+
 
 # Project class
 class Project(db.Model):
@@ -132,6 +135,9 @@ class Project(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), unique=True, nullable=False)
     description = db.Column(db.String(255), nullable=False)
+
+    def __str__(self):
+        return self.name
 
 
 # Activity class
@@ -142,6 +148,9 @@ class Activity(db.Model):
     description = db.Column(db.String(255), nullable=False)
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
     project = relationship(Project, backref='activity')
+
+    def __str__(self):
+        return self.name
 
 
 # Change class
