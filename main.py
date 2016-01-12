@@ -34,6 +34,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:root@localhost:3306/flask_
 app.config['SECURITY_PASSWORD_HASH'] = 'pbkdf2_sha512'
 # Replace this with your own salt.
 app.config['SECURITY_PASSWORD_SALT'] = 'xxxxxxxxxxxxxxx'
+app.config['SECURITY_REGISTERABLE'] = True
 
 # Flask-Security optionally sends email notification to users upon registration, password reset, etc.
 # It uses Flask-Mail behind the scenes.
