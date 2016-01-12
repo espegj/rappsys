@@ -370,6 +370,8 @@ def ajax_response(status, msg):
 # Customized User model for SQL-Admin
 class UserAdmin(sqla.ModelView):
 
+    column_searchable_list = ('email',)
+
     # Don't display the password on the list of Users
     column_exclude_list = ('password',)
 
@@ -408,19 +410,32 @@ class UserAdmin(sqla.ModelView):
             model.password = utils.encrypt_password(model.password2)
 
 
+
 # Customized Role model for SQL-Admin
 class RoleAdmin(sqla.ModelView):
-
+    column_auto_select_related = True
     # Prevent administration of Roles unless the currently logged-in user has the "admin" role
     def is_accessible(self):
         return current_user.has_role('admin')
 
+
+# Customized Project model for SQL-Admin
+class ProjectAdmin(sqla.ModelView):
+    column_auto_select_related = True
+    column_exclude_list = ('activity',)
+    form_excluded_columns = ('activity',)
+    # Prevent administration of Project unless the currently logged-in user has the "admin" role
+    def is_accessible(self):
+        return current_user.has_role('admin')
+
+
 # Initialize Flask-Admin
 admin = Admin(app)
 
-# Add Flask-Admin views for Users and Roles
+# Add Flask-Admin views
 admin.add_view(UserAdmin(User, db.session))
 admin.add_view(RoleAdmin(Role, db.session))
+admin.add_view(ProjectAdmin(Project, db.session))
 
 
 # If running locally, listen on all IP addresses, port 8080
