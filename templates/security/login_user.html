@@ -4,35 +4,52 @@
 
 
 <div class="container">
-
-
-<div class="row content">
+    <div class="row">
   <div class="col-md-4">
     <div class="page-header">
   <h1>Login</h1>
 </div>
-  <div class="span4 offset1">
-{% include "security/_messages.html" %}
-<form action="{{ url_for_security('login') }}" method="POST" name="login_form">
-  {{ login_user_form.hidden_tag() }}
-  {{ render_field_with_errors(login_user_form.email, class_="form-control") }}
-  {{ render_field_with_errors(login_user_form.password, class_="form-control") }}
-  {{ render_field_with_errors(login_user_form.remember) }}
-  {{ render_field(login_user_form.next) }}
-  {{ render_field(login_user_form.submit, class_="btn btn-default") }}
+
+      <form id="tryitForm" action="{{ url_for_security('login') }}" method="POST" name="login_form" class="">
+
+    <div class="form-group">
+        {{ login_user_form.hidden_tag() }}
+    </div>
+
+    <div class="form-group">
+            <input placeholder="email" type="text" class="form-control" name="email" />
+    </div>
+
+    <div class="form-group">
+            <input placeholder="password" type="password" class="form-control" name="password" />
+    </div>
+
+    <div class="form-group">
+            {{ render_field(login_user_form.remember) }}
+            <h7>Husk meg</h7>
+    </div>
+
+    <div class="form-group">
+            <button type="submit" class="btn btn-primary">Login</button>
+    </div>
 </form>
-    <form action="/recovery">
-    <input type="submit" class="btn btn-default" value="Glemt passord">
-</form>
-    <br>
-</form>
-    <form action="/register">
-    <input type="submit" class="btn btn-default" value="Registrer ny bruker">
-</form>
+
+      <a href="/recovery">Glemt passord</a>
+      <a href="/register">Registrer ny bruker</a>
+
     </div>
   </div>
   </div>
   </div>
+
+
+
+
+<script src="/static/js/bootstrap.min.js"></script>
+<script src="/static/js/validator.js"></script>
+<script src="/static/js/bootstrapvalidator.js"></script>
+
+
 {% endblock %}
 
 

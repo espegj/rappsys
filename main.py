@@ -51,7 +51,6 @@ app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = 'webcoreconsulting@gmail.com'
 app.config['MAIL_PASSWORD'] = 'QA5-as3-MVU-5LW'
 
-
 # Initialize Flask-Mail and SQLAlchemy
 mail = Mail(app)
 db = SQLAlchemy(app)
