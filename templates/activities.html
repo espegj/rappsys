@@ -7,9 +7,13 @@
 
 <p>Liste over aktiviteter i dette prosjektet</p>
 <br>
-   {% for x in activity_list %}
-    <a href="{{ url_for('activity', activity_id=x.id, activity=x.name) }}"><p>{{ x.name }}</p></a>
-    {% endfor %}
+            {% for x in activity_list %}
+                <a class="list-group-item" href="{{ url_for('activity', activity_id=x.id, activity=x.name) }}"><br>
+                    <h2 class="list-group-item-heading">{{ x.name }}</h2>
+                    <p class="list-group-item-text">Noe tekst som samsvarer med aktivitet...</p><br>
+                </a><br>
+            {% endfor %}
+        </ul>
         </div>
         </div>
 </div>

@@ -2,13 +2,19 @@
 {% block content %}
 <div class="container">
     <div class="row content">
-    <div class="col-md-12">
-<h1>Liste over dine prosjekter</h1><br/>
-    {% for x in project_list %}
-    <a href="{{ url_for('activities', project_id=x.id, project=x.name) }}"><p>{{ x.name }}</p></a><br/>
-    {% endfor %}
+        <div class="col-md-12">
+        <h1>Liste over dine prosjekter</h1><br/>
+        <ul class="list-group list">
+            {% for x in project_list %}
+                <a class="list-group-item" href="{{ url_for('activities', project_id=x.id, project=x.name) }}"><br/>
+                    <h2 class="list-group-item-heading">{{ x.name }}</h2>
+                    <p class="list-group-item-text">Kort beskrivelse av prosjektet...</p><br>
+                </a>
+            {% endfor %}
+        </ul>
         </div>
-        </div>
+    </div>
+
 </div>
 {% endblock %}
 
