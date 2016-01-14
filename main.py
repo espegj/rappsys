@@ -51,6 +51,10 @@ app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = 'webcoreconsulting@gmail.com'
 app.config['MAIL_PASSWORD'] = 'QA5-as3-MVU-5LW'
 
+app.config['SECURITY_MSG_EMAIL_ALREADY_ASSOCIATED'] = ('Mailen er allerede registrert','error')
+app.config['SECURITY_MSG_INVALID_PASSWORD'] = ('Feil passord','error')
+app.config['SECURITY_MSG_USER_DOES_NOT_EXIST'] = ('Bruker finnes ikke','error')
+
 # Initialize Flask-Mail and SQLAlchemy
 mail = Mail(app)
 db = SQLAlchemy(app)
