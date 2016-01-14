@@ -219,7 +219,7 @@ def index():
 @app.route('/test')
 #@roles_accepted('end-user', 'admin')
 def test():
-    return ""
+    return redirect("/")
 
 
 @app.route('/recovery')
@@ -243,12 +243,12 @@ def recovery_password():
         msg.body = "Bruk dette passordet faar aa opprette et nytt: " + pas
         try:
             mail.send(msg)
-            return render_template('set_new_pass.html')
+            return render_template('set_new_pass.html', email=email)
         except:
-            return "Ikke gyldig mail"
+            return "Det har oppstaatt en feil.. Proev igjen."
     else:
         db.session.close()
-        return "Bruker eksisterer ikke"
+        return "Bruker eksisterer ikke. Proev igjen."
 
 
 
@@ -256,7 +256,7 @@ def recovery_password():
 def set_new_password():
     email = request.form['email']
     pas = hashlib.sha224(request.form['pas']).hexdigest()
-    new_pas = utils.encrypt_password(request.form['new_pas'])
+    new_pas = utils.encrypt_password(request.form['password'])
     user = db.session.query(User).filter(User.email == email).first()
     print pas
     print user.recovery_password
@@ -264,9 +264,9 @@ def set_new_password():
         user.password = new_pas
         user.recovery_password = None
         db.session.commit()
-        return "Passord endret"
+        return redirect('/')
     else:
-        return "feil.."
+        return "Det har oppstaatt en feil.. Proev igjen."
 
 
 
