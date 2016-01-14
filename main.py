@@ -245,10 +245,10 @@ def recovery_password():
             mail.send(msg)
             return render_template('set_new_pass.html', email=email)
         except:
-            return "Det har oppstaatt en feil.. Proev igjen."
+            return render_template("error.html", error=323, message="Det har oppstatt en feil ved utsending av mail..")
     else:
         db.session.close()
-        return "Bruker eksisterer ikke. Proev igjen."
+        return render_template("error.html", error=541, message="Bruker eksisterer ikke..")
 
 
 
@@ -266,7 +266,7 @@ def set_new_password():
         db.session.commit()
         return redirect('/')
     else:
-        return "Det har oppstaatt en feil.. Proev igjen."
+        return render_template("error.html", error=692, message="Det har oppstatt en feil..")
 
 
 

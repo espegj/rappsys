@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row-fluid">
+    <div class="col-md-4 col-sm-offset-2">
+        <h1></h1>
+        <div class="well">
+            <h3>{{ message }}</h3>
+            <h4>Error {{ error }}</h4>
+            <form>
+                <div class="form-group">
+                    <input Type="button" VALUE="Tilbake" class="btn btn-primary" onClick="history.go(-1);return true;">
+                </div>
+            </form>
+            <a href="{{ url_for('security.login') }}">Logg inn</a>
+            <a> | </a>
+            <a href="/register">Registrer ny bruker</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
