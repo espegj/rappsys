@@ -9,7 +9,7 @@
                 <a class="list-group-item" href="{{ url_for('activities', project_id=x.id, project=x.name) }}"><br/>
                     <h2 class="list-group-item-heading">{{ x.name }}</h2>
                     <p class="list-group-item-text">Kort beskrivelse av prosjektet...</p><br>
-                </a>
+                </a><br/>
             {% endfor %}
         </ul>
         </div>
