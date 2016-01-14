@@ -6,7 +6,7 @@
 # Uses Flask-Admin to provide an admin UI for the lists of users and roles.
 # SQLAlchemy ORM, Flask-Mail and WTForms are used in supporting roles, as well.
 
-from flask import Flask, render_template, request, url_for, redirect, g
+from flask import Flask, render_template, request, url_for, redirect, g, flash
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
 from flask.ext.security import current_user, login_required, roles_required, roles_accepted, RoleMixin, Security, \
@@ -215,11 +215,10 @@ def password_generator(size=8, chars=string.ascii_uppercase + string.digits + st
 def index():
     return render_template('index.html')
 
-
 @app.route('/test')
 #@roles_accepted('end-user', 'admin')
 def test():
-    return redirect("/")
+    return "test"
 
 
 @app.route('/recovery')
