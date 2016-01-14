@@ -1,13 +1,28 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container">
-    <div class="row content">
-    <div class="col-md-4">
-    <form action="recovery-password" method="Post">
-        <input type="email" placeholder="Email" name="email" class="form-control" id="email">
-        <button type="submit" value="submit" class="btn btn-default">Submit</button>
+<div class="row-fluid">
+    <div class="col-md-4 col-sm-offset-2">
+        <h1></h1>
+        <div class="well">
+            <h1>Glemt passord</h1>
+    <form id="tryitForm2" action="recovery-password" method="Post">
+
+        <div class="form-group">
+            <input type="email" placeholder="Email" name="email" class="form-control" id="email">
+        </div>
+
+        <div class="form-group">
+            <button type="submit" value="submit" class="btn btn-primary">Nytt passord</button>
+        </div>
+
     </form>
+            <p>Har allerede passord? <a href="{{ url_for('security.login') }}">Logg inn</a></p>
         </div>
-        </div>
+    </div>
 </div>
+
+<script src="/static/js/bootstrap.min.js"></script>
+<script src="/static/js/validatorRegister.js"></script>
+<script src="/static/js/bootstrapvalidator.js"></script>
+
 {% endblock %}

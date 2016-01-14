@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% from "security/_macros.html" import render_field_with_errors, render_field %}
+{% block content %}
+{{ super() }}
+<div class="row-fluid">
+    <div class="col-md-4 col-sm-offset-2">
+        <h1></h1>
+        <div class="well">
+            <h1>Registrer</h1>
+            <form id="tryitForm2" action="{{ url_for_security('register') }}" method="POST" name="register_form">
+                <div class="form-group">
+                    {{ register_user_form.hidden_tag() }}
+                </div>
+
+                <div class="form-group">
+                    <input placeholder="email" type="text" class="form-control" name="email" />
+                </div>
+
+                <div class="form-group">
+                    <input placeholder="password" type="password" class="form-control" name="password" />
+                </div>
+
+                <div class="form-group">
+                    <input placeholder="password" type="password" class="form-control" name="password_confirm" />
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Registrer</button>
+                </div>
+
+            </form>
+            <p>Allerede registrert bruker? <a href="{{ url_for('security.login') }}">Logg inn</a></p>
+        </div>
+    </div>
+</div>
+
+<script src="/static/js/bootstrap.min.js"></script>
+<script src="/static/js/validatorRegister.js"></script>
+<script src="/static/js/bootstrapvalidator.js"></script>
+
+{% endblock content %}

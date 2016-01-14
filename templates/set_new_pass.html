@@ -1,10 +1,40 @@
 {% extends "base.html" %}
 {% block content %}
-Sett nytt passord
-    <form action="set_new_password" method="Post">
-        <input type="email" placeholder="Email" name="email" class="form-control" id="email">
-        <input type="text" placeholder="Passord mottatt på mail" name="pas" class="form-control" id="pas">
-        <input type="password" placeholder="Nytt passord" name="new_pas" class="form-control" id="new_pas">
-        <button type="submit" value="submit" class="btn btn-default">Submit</button>
+<div class="row-fluid">
+    <div class="col-md-4 col-sm-offset-2">
+        <h1></h1>
+        <div class="well">
+            <h1>Glemt passord</h1>
+    <form id="tryitForm2" action="set_new_password" method="Post">
+        <div class="form-group">
+            <input type="email" placeholder="Email" name="email" class="form-control" id="email" value={{ email }}>
+        </div>
+
+        <div class="form-group">
+            <input type="text" placeholder="Passord mottatt på mail" name="pas" class="form-control" id="pas">
+        </div>
+
+        <div class="form-group">
+            <input type="password" placeholder="Nytt passord" name="password" class="form-control" id="password">
+        </div>
+
+        <div class="form-group">
+            <input type="password" placeholder="Bekreft passord" name="password_confirm" class="form-control">
+        </div>
+
+        <div class="form-group">
+            <button type="submit" value="submit" class="btn btn-primary">Sett nytt passord</button>
+        </div>
+
     </form>
+            <p>Tilbake til innlogging? <a href="{{ url_for('security.login') }}">Logg inn</a></p>
+                    </div>
+    </div>
+</div>
+
+
+<script src="/static/js/bootstrap.min.js"></script>
+<script src="/static/js/validatorRegister.js"></script>
+<script src="/static/js/bootstrapvalidator.js"></script>
+
 {% endblock %}
