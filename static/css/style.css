@@ -46,3 +46,12 @@ body {
     cursor: inherit;
     display: block;
 }
+
+a.li {
+    margin-top: 2em;
+}
+
+input.search {
+    width: 100%;
+    margin-top: 2em;
+}

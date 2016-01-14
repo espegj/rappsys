@@ -8,8 +8,7 @@
 <form id="upload-form" action="{{ url_for('upload') }}"  method="POST" enctype="multipart/form-data">
     <input type="hidden" name="activity_id" value="{{ activity_id }}">
 
-    <strong>Beskrivelse:</strong><br>
-    <textarea class="form-control" rows="4" cols="40" name="textarea"></textarea><p><br/>
+    <textarea class="form-control" rows="4" cols="40" name="textarea" placeholder="Kort beskrivelse av endring..."></textarea><p><br/>
     <br/>
     <input id="file-picker" type="file" name="file" accept="image/*" multiple><p><br/>
 
