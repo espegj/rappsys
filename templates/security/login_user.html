@@ -14,7 +14,7 @@
     </div>
 
     <div class="form-group">
-             {{ render_field(login_user_form.email, class_="form-control", placeholder="email") }}
+             {{ render_field(login_user_form.email, class_="form-control", placeholder="email", onchange="document.form2.email.value=this.value;") }}
              {% if login_user_form.email.errors %}
                 <ul>
                     {% for error in login_user_form.email.errors %}
@@ -44,9 +44,14 @@
             <button type="submit" class="btn btn-primary">Login</button>
     </div>
 </form>
-      <a href="/recovery">Glemt passord</a>
+
+            <form id="form" action="recovery " method="POST" name="form2">
+                {{ render_field(login_user_form.email, placeholder="email", hidden="true") }}
+            </form>
+            {{ email }}
+            <a href="#" onclick="document.forms[1].submit();return false;">Glemt passord?</a>
             <a> | </a>
-      <a href="/register">Registrer ny bruker</a>
+            <a href="/register">Registrer ny bruker</a>
 
         </div>
     </div>

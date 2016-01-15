@@ -6,12 +6,25 @@
         <div class="well">
             <h1>Glemt passord</h1>
     <form id="tryitForm2" action="set_new_password" method="Post">
+        <br>
         <div class="form-group">
-            <input type="email" placeholder="Email" name="email" class="form-control" id="email" value={{ email }}>
+            <input type="email" name="email" class="form-control" id="email" value={{ email }} readonly="true">
         </div>
 
         <div class="form-group">
             <input type="text" placeholder="Passord mottatt på mail" name="pas" class="form-control" id="pas">
+        </div>
+
+        <div class="form-group">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <ul class=flashes>
+                        {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+                     </ul>
+                {% endif %}
+            {% endwith %}
         </div>
 
         <div class="form-group">
@@ -24,6 +37,7 @@
 
         <div class="form-group">
             <button type="submit" value="submit" class="btn btn-primary">Sett nytt passord</button>
+            <input Type="button" VALUE="Tilbake" class="btn btn-primary" onClick="history.go(-1);return true;">
         </div>
 
     </form>

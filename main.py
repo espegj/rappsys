@@ -6,7 +6,7 @@
 # Uses Flask-Admin to provide an admin UI for the lists of users and roles.
 # SQLAlchemy ORM, Flask-Mail and WTForms are used in supporting roles, as well.
 
-from flask import Flask, render_template, request, url_for, redirect, g, flash
+from flask import Flask, render_template, request, url_for, redirect, g, flash, session
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
 from flask.ext.security import current_user, login_required, roles_required, roles_accepted, RoleMixin, Security, \
@@ -222,12 +222,14 @@ def index():
 @app.route('/test')
 #@roles_accepted('end-user', 'admin')
 def test():
-    return "test"
+    return redirect('/login?next=' + request.path)
 
 
-@app.route('/recovery')
+@app.route('/recovery', methods=['POST'])
 def recovery():
-    return render_template('recovery.html')
+    email = request.form['email']
+    session.pop('_flashes', None)
+    return render_template('recovery.html', email=email)
 
 
 @app.route('/recovery-password', methods=['POST'])
@@ -251,19 +253,22 @@ def recovery_password():
             return render_template("error.html", error=323, message="Det har oppstatt en feil ved utsending av mail..")
     else:
         db.session.close()
-        return render_template("error.html", error=541, message="Bruker eksisterer ikke..")
+        flash("Brukeren eksisterer ikke")
+        return render_template("recovery.html")
 
 
 
 @app.route('/set_new_password', methods=['POST'])
 def set_new_password():
     email = request.form['email']
+    print email
     pas = hashlib.sha224(request.form['pas']).hexdigest()
     new_pas = utils.encrypt_password(request.form['password'])
     user = db.session.query(User).filter(User.email == email).first()
-    print pas
-    print user.recovery_password
-    if user != None and pas == user.recovery_password and new_pas != None:
+    if pas != user.recovery_password:
+        flash("Feil passord")
+        return render_template('set_new_pass.html', email=email)
+    elif user != None and pas == user.recovery_password and new_pas != None:
         user.password = new_pas
         user.recovery_password = None
         db.session.commit()

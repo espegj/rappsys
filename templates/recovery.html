@@ -8,8 +8,20 @@
     <form id="tryitForm2" action="recovery-password" method="Post">
 
         <div class="form-group">
-            <input type="email" placeholder="Email" name="email" class="form-control" id="email">
+            <input type="email" placeholder="Email" name="email" class="form-control" id="email" value={{ email }}>
         </div>
+
+        <div class="form-group">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul class=flashes>
+                    {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+            </div>
 
         <div class="form-group">
             <button type="submit" value="submit" class="btn btn-primary">Nytt passord</button>
