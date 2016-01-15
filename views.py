@@ -1,4 +1,4 @@
-from flask import render_template, request, url_for, redirect, g, flash, session
+from flask import render_template, request, url_for, redirect
 from flask.ext.security import current_user, login_required, roles_required, roles_accepted, utils
 from flask_mail import Mail, Message
 from uuid import uuid4
@@ -22,6 +22,11 @@ def index():
 #@roles_accepted('end-user', 'admin')
 def test():
     return ""
+
+
+# Generates random password
+def password_generator(size=8, chars=string.ascii_uppercase + string.digits + string.ascii_lowercase):
+    return ''.join(random.choice(chars) for _ in range(size))
 
 
 @app.route('/recovery', methods=['POST'])
@@ -60,7 +65,6 @@ def recovery_password():
 @app.route('/set_new_password', methods=['POST'])
 def set_new_password():
     email = request.form['email']
-    print email
     pas = hashlib.sha224(request.form['pas']).hexdigest()
     new_pas = utils.encrypt_password(request.form['password'])
     user = db.session.query(User).filter(User.email == email).first()
@@ -174,11 +178,6 @@ def upload_complete(uuid):
         files.append(fname)
 
     return render_template("files.html", uuid=uuid, files=files)
-
-
-# Generates random password
-def password_generator(size=8, chars=string.ascii_uppercase + string.digits + string.ascii_lowercase):
-    return ''.join(random.choice(chars) for _ in range(size))
 
 
 def ajax_response(status, msg):
