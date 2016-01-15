@@ -69,7 +69,7 @@ class ProjectAdmin(sqla.ModelView):
 
 
 # Initialize Flask-Admin
-admin = Admin(app)
+admin = Admin(app, 'Example: Layout-BS3', base_template='layout.html', template_mode='bootstrap3')
 
 # Add Flask-Admin views
 admin.add_view(UserAdmin(User, db.session))
