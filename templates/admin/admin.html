@@ -1,0 +1,58 @@
+{% extends 'admin/master.html' %}
+{% block body %}
+{{ super() }}
+<br>
+<br>
+<div class="row">
+    <div class="col-md-3">
+        <h4>Nytt prosjekt</h4>
+
+        <form>
+            <div class="form-group">
+                <input type="tesxt" class="form-control" placeholder="Navn">
+            </div>
+            <div class="form-group">
+                <textarea type="textarea" class="form-control" placeholder="Beskrivelse" rows="6"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Opprett</button>
+        </form>
+    </div>
+
+    <div class="col-md-4">
+        <h4>Prosjekter</h4>
+
+        <div class="form-group">
+            <input type="search" class="form-control" placeholder="Søk">
+        </div>
+        <div class="form-group">
+            <ul class="">
+                {% for x in project_list %}
+                <a class="li" href=""><br/>
+
+                    <h4 class="list-group-item-heading name">{{ x.name }}</h4>
+
+                    <p class="list-group-item-text description">{{ x.description }}</p><br/>
+                </a>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <h4>Siste aktiviteter</h4>
+                <div class="form-group">
+            <ul class="">
+                {% for x in activity_list %}
+                <a class="li" href=""><br/>
+
+                    <h4 class="list-group-item-heading name">{{ x.name }}</h4>
+
+                    <p class="list-group-item-text description">{{ x.description }}</p><br/>
+                </a>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+</div>
+{% endblock body %}

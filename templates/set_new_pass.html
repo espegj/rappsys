@@ -36,19 +36,22 @@
         </div>
 
         <div class="form-group">
-            <button type="submit" value="submit" class="btn btn-primary">Sett nytt passord</button>
-            <input Type="button" VALUE="Tilbake" class="btn btn-primary" onClick="history.go(-1);return true;">
+            <button type="submit" class="ladda-button" data-color="blue" data-size="xs" data-style="slide-up">
+                <span>Sett nytt passord</span>
+            </button>
         </div>
 
     </form>
             <p>Tilbake til innlogging? <a href="{{ url_for('security.login') }}">Logg inn</a></p>
+            <p>Feil Email? <a href="javascript:history.back()">Tilbake</a></p>
                     </div>
     </div>
 </div>
 
+<script src="/static/js/test.js"></script>
 
 <script src="/static/js/bootstrap.min.js"></script>
-<script src="/static/js/validatorRegister.js"></script>
+<script src="/static/js/validatorSetNew.js"></script>
 <script src="/static/js/bootstrapvalidator.js"></script>
 
 {% endblock %}

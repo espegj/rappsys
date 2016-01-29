@@ -70,15 +70,16 @@ def set_new_password():
     user = db.session.query(User).filter(User.email == email).first()
     if pas != user.recovery_password:
         flash("Feil passord")
-        return render_template('set_new_pass.html', email=email)
+        return None
+        #return render_template('set_new_pass.html', email=email)
     elif user != None and pas == user.recovery_password and new_pas != None:
         user.password = new_pas
         user.recovery_password = None
         db.session.commit()
-        return redirect('/')
+        return render_template('set_new_pass.html', email=email)
     else:
-        return render_template("error.html", error=692, message="Det har oppstatt en feil..")
-
+        #return render_template("error.html", error=692, message="Det har oppstatt en feil..")
+        return None
 
 
 

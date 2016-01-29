@@ -24,9 +24,10 @@
             </div>
 
         <div class="form-group">
-            <button type="submit" value="submit" class="btn btn-primary">Nytt passord</button>
+            <button type="submit" value="submit" class="ladda-button" data-color="blue" data-size="xs">
+                <span class="ladda-label">Nytt passord</span>
+            </button>
         </div>
-
     </form>
             <p>Har allerede passord? <a href="{{ url_for('security.login') }}">Logg inn</a></p>
         </div>
@@ -34,7 +35,7 @@
 </div>
 
 <script src="/static/js/bootstrap.min.js"></script>
-<script src="/static/js/validatorRegister.js"></script>
+<script src="/static/js/validatorEmail.js"></script>
 <script src="/static/js/bootstrapvalidator.js"></script>
 
 {% endblock %}

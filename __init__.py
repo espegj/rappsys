@@ -9,7 +9,5 @@ app.config.from_object(BaseConfig)
 
 mail = Mail(app)
 db = SQLAlchemy(app)
-
 mail.init_app(app)
-
 import views

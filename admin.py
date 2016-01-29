@@ -1,9 +1,9 @@
 from flask.ext.security import current_user
-from flask.ext.admin import Admin
+from flask.ext.admin import Admin, BaseView, expose
 from flask.ext.admin.contrib import sqla
 from wtforms.fields import PasswordField
 
-from __init__ import app
+from __init__ import app, db
 from models import *
 
 # Customized User model for SQL-Admin
@@ -67,11 +67,19 @@ class ProjectAdmin(sqla.ModelView):
     def is_accessible(self):
         return current_user.has_role('admin')
 
+class MyView(BaseView):
+    @expose('/')
+    def index(self):
+        project_list = db.session.query(Project).all()
+        activity_list = db.session.query(Activity).all()
+        return self.render('admin/admin.html', project_list=project_list, activities_list=activity_list)
+
 
 # Initialize Flask-Admin
-admin = Admin(app, 'Example: Layout-BS3', base_template='layout.html', template_mode='bootstrap3')
+admin = Admin(app, base_template='layout.html', template_mode='bootstrap3')
 
 # Add Flask-Admin views
+admin.add_view(MyView(name='Administrator'))
 admin.add_view(UserAdmin(User, db.session))
 admin.add_view(RoleAdmin(Role, db.session))
 admin.add_view(ProjectAdmin(Project, db.session))
