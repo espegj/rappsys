@@ -133,6 +133,7 @@ def folder():
             return render_template("folder.html", data=p, back="true")
     except:
         print 'test'
+
     user_id = current_user.id
     project_list = db.session.query(Project).join(User.projects).filter(User.id == user_id).all()
 
@@ -143,7 +144,10 @@ def folder():
 
     activity_list = []
     for x in folder_id_list:
-        activity_list.extend(db.session.query(ActivityTest).filter(ActivityTest.project_id == x).all())
+        activity_list.extend(db.session.query(ActivityTest).join(User.activities).filter(User.id == user_id).\
+        filter(ActivityTest.project_id == x).all())
+        print activity_list
+        # activity_list.extend(db.session.query(ActivityTest).filter(ActivityTest.project_id == x).all())
 
     class Children(object):
         def __init__(self, name=None, id=None, project_id=None, parent_id=None, isActivity=None, isFolder=None):
@@ -188,8 +192,7 @@ def folder():
                 return [x for x in children if x.parent_id == node.id]
 
     tree = get_nodes("Root")
-    text = "{'text': 'Root', 'nodes': [{'text': u'Prosjekt3'}, {'text': u'Prosjekt4', 'nodes': [{'text': u'mappe8'}]}]}"
-
+    
     return render_template("folder.html", data=tree)
 
 

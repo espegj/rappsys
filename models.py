@@ -21,7 +21,7 @@ projects_users = db.Table(
 activities_users = db.Table(
     'activities_users',
     db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
-    db.Column('activity_id', db.Integer(), db.ForeignKey('activity.id'))
+    db.Column('activity_id', db.Integer(), db.ForeignKey('activity_test.id'))
 )
 
 
@@ -65,7 +65,7 @@ class User(db.Model, UserMixin):
         backref=db.backref('users', lazy='dynamic')
     )
     activities = db.relationship(
-        'Activity',
+        'ActivityTest',
         secondary=activities_users,
         backref=db.backref('users', lazy='dynamic')
     )
@@ -114,26 +114,13 @@ class ActivityTest(db.Model):
         return self.name
 
 
-# Activity class
-class Activity(db.Model):
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(255), nullable=False)
-    description = db.Column(db.String(255), nullable=False)
-    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
-    project = relationship(Project, backref='activity')
-
-    def __str__(self):
-        return self.name
-
-
 # Change class
 class Change(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     description = db.Column(db.String(255), nullable=False)
-    activity_id = db.Column(db.Integer, db.ForeignKey('activity.id'))
-    activity = relationship(Activity, backref='change')
+    activity_test_id = db.Column(db.Integer, db.ForeignKey('activity_test.id'))
+    activity_test = relationship(ActivityTest, backref='change')
 
 
 # Image class
