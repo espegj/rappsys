@@ -1,12 +1,10 @@
-from flask import render_template, request, url_for, redirect, g, flash, session
+from flask import render_template, request, url_for, redirect, g, flash, session, Flask, jsonify
 from flask.ext.security import current_user, login_required, roles_required, roles_accepted, utils
 from flask_mail import Mail, Message
 from uuid import uuid4
-import random, string, hashlib, os, json, glob
-
+import random, string, hashlib, os, json, glob, ast
 from __init__ import app, db, mail
 from admin import *
-
 
 
 # Displays the home page.
@@ -19,9 +17,9 @@ def index():
 
 
 @app.route('/test')
-#@roles_accepted('end-user', 'admin')
+# @roles_accepted('end-user', 'admin')
 def test():
-    return ""
+    return utils.encrypt_password('123456')
 
 
 # Generates random password
@@ -88,12 +86,21 @@ def set_new_password():
 @app.route('/activities')
 @roles_accepted('end-user', 'admin')
 def activities():
+
     project = request.args.get('project')
     project_id = request.args.get('project_id')
     user_id = current_user.id
     activity_list = db.session.query(Activity).join(User.activities).filter(User.id == user_id).\
         filter(Activity.project_id == project_id).all()
-    return render_template("activities.html", activity_list=activity_list, project=project)
+
+    activity_list2 = db.session.query(Folder).filter(Folder.project_id == Project.id)\
+        .filter(Folder.parent_id == None).all()
+
+    for x in activity_list2:
+
+        print x.name
+
+    return render_template("activities.html", activity_list=activity_list2, project=project)
 
 
 @app.route('/projects')
@@ -110,6 +117,80 @@ def activity():
     activity = request.args.get('activity')
     activity_id = request.args.get('activity_id')
     return render_template("activity.html", activity=activity, activity_id=activity_id)
+
+
+@app.route('/folder', methods=['GET', 'POST'])
+@roles_accepted('end-user', 'admin')
+def folder():
+
+    try:
+        struct = request.form['struct']
+        p = ast.literal_eval(struct)
+
+        if p['isActivity'] == 1:
+            return render_template("folder.html", back="true")
+        else:
+            return render_template("folder.html", data=p, back="true")
+    except:
+        print 'test'
+    user_id = current_user.id
+    project_list = db.session.query(Project).join(User.projects).filter(User.id == user_id).all()
+
+    folder_id_list = [id.id for id in project_list]
+    folder_list = []
+    for x in folder_id_list:
+        folder_list.extend(db.session.query(Folder).filter(Folder.project_id == x).all())
+
+    activity_list = []
+    for x in folder_id_list:
+        activity_list.extend(db.session.query(ActivityTest).filter(ActivityTest.project_id == x).all())
+
+    class Children(object):
+        def __init__(self, name=None, id=None, project_id=None, parent_id=None, isActivity=None, isFolder=None):
+            self.name = name
+            self.id = id
+            self.project_id = project_id
+            self.parent_id = parent_id
+            self.isActivity = isActivity
+            self.isFolder = isFolder
+
+    children = []
+    [children.append(Children(x.name, x.id, x.project_id, x.parent_id, 0, 1)) for x in folder_list]
+    [children.append(Children(x.name, x.id, x.project_id, x.folder_id, 1, 0)) for x in activity_list]
+    [children.append(Children(x.name, x.id, 'Root', 0, 0, 0)) for x in project_list]
+
+    root_nodes = {x for x in children if x.project_id == 0}
+    links = []
+    for node in root_nodes:
+        links.append(("Root", node.id))
+
+    def get_nodes(node):
+        d = {}
+        if node == "Root":
+            d["text"] = node
+        else:
+            d["text"] = node.name
+            d["isActivity"] = node.isActivity
+            d["isFolder"] = node.isFolder
+
+        getchildren = get_children(node)
+        if getchildren:
+            d["nodes"] = [get_nodes(child) for child in getchildren]
+        return d
+
+    def get_children(node):
+        if node == 'Root':
+            return [x for x in children if x.project_id == node]
+        elif node.parent_id == 0 and node.isActivity == 0:
+            return [x for x in children if x.project_id == node.id and x.parent_id == None]
+        else:
+            if node.isActivity == 0:
+                return [x for x in children if x.parent_id == node.id]
+
+    tree = get_nodes("Root")
+    text = "{'text': 'Root', 'nodes': [{'text': u'Prosjekt3'}, {'text': u'Prosjekt4', 'nodes': [{'text': u'mappe8'}]}]}"
+
+    return render_template("folder.html", data=tree)
 
 
 @app.route('/change')

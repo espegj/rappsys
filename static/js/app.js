@@ -1,12 +1,18 @@
 var options = {
-  valueNames: [ 'name', 'description' ]
+  valueNames: [ 'name', 'description', 'name1', 'description1' ]
 };
-
 var projectList = new List('projects', options);
 
-var options1 = {
-  valueNames: [ 'name', 'description' ]
-};
+$(document).ready(function(){
+    $('.prosjekt-child').click(function(){
+        $(this).children().slideToggle();
+    });
 
-var activityList = new List('activities', options1);
+});
+
+function submit(id) {
+        document.getElementById(id).submit();
+}
+
+
 

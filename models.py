@@ -85,6 +85,35 @@ class Project(db.Model):
         return self.name
 
 
+# Folder class
+class Folder(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255))
+    parent_id = db.Column(db.Integer, db.ForeignKey('folder.id'))
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+    project = relationship(Project, backref='folder')
+
+    def __str__(self):
+        return self.name
+
+
+# ActivityTest class
+class ActivityTest(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    description = db.Column(db.String(255), nullable=False)
+    isActivity = db.Column(db.Integer)
+    folder_id = db.Column(db.Integer, db.ForeignKey('folder.id'))
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+    project = relationship(Project, backref='ActivityTest')
+    folder = relationship(Folder, backref='ActivityTest')
+
+    def __str__(self):
+        return self.name
+
+
 # Activity class
 class Activity(db.Model):
 
