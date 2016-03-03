@@ -14,7 +14,7 @@
     </div>
 
     <div class="form-group">
-             {{ render_field(login_user_form.email, class_="form-control", placeholder="email", onchange="document.form2.email.value=this.value;") }}
+             {{ render_field(login_user_form.email, class_="form-control", type="email", placeholder="email", onchange="document.form2.email.value=this.value;") }}
              {% if login_user_form.email.errors %}
                 <ul>
                     {% for error in login_user_form.email.errors %}

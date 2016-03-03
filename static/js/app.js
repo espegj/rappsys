@@ -11,8 +11,19 @@ $(document).ready(function(){
 });
 
 function submit(id) {
-        document.getElementById(id).submit();
+     document.getElementById(id).submit();
 }
 
 
+var divs = $('div[data-filter]');
+$('#search').on('keyup', function() {
+    var val = $.trim(this.value);
+    divs.hide();
+    divs.filter(function() {
+        return $(this).data('filter').search(val.ignoreCase) >= 0
+    }).show();
 
+    if ($(this).val() == "") {
+        $(".el").hide();
+            }
+});

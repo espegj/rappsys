@@ -1,0 +1,30 @@
+{% extends 'admin/master.html' %}
+{% block body %}
+{{ super() }}
+<br>
+<br>
+<div class="row">
+
+    <table class="table table-bordered">
+  <thead>
+    <tr>
+      <th>Endring</th>
+      <th>Prosjekt</th>
+      <th>Aktivitet</th>
+      <th>Bruker</th>
+      <th>Bilde</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>+</td>
+      <td>Prosjekt1</td>
+      <td>Aktivitet2</td>
+      <td>Gunnar Knutsen</td>
+      <td><a href="">vis bilde</a></td>
+    </tr>
+  </tbody>
+</table>
+
+</div>
+{% endblock body %}

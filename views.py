@@ -122,18 +122,6 @@ def activity():
 @app.route('/folder', methods=['GET', 'POST'])
 @roles_accepted('end-user', 'admin')
 def folder():
-
-    try:
-        struct = request.form['struct']
-        p = ast.literal_eval(struct)
-
-        if p['isActivity'] == 1:
-            return render_template("folder.html", back="true")
-        else:
-            return render_template("folder.html", data=p, back="true")
-    except:
-        print 'test'
-
     user_id = current_user.id
     project_list = db.session.query(Project).join(User.projects).filter(User.id == user_id).all()
 
@@ -146,22 +134,26 @@ def folder():
     for x in folder_id_list:
         activity_list.extend(db.session.query(ActivityTest).join(User.activities).filter(User.id == user_id).\
         filter(ActivityTest.project_id == x).all())
-        print activity_list
         # activity_list.extend(db.session.query(ActivityTest).filter(ActivityTest.project_id == x).all())
 
     class Children(object):
-        def __init__(self, name=None, id=None, project_id=None, parent_id=None, isActivity=None, isFolder=None):
+        def __init__(self, name=None, id=None, project_id=None, parent_id=None, isActivity=None, isFolder=None, description=None):
             self.name = name
             self.id = id
             self.project_id = project_id
             self.parent_id = parent_id
             self.isActivity = isActivity
             self.isFolder = isFolder
+            self.description = description
+
 
     children = []
-    [children.append(Children(x.name, x.id, x.project_id, x.parent_id, 0, 1)) for x in folder_list]
-    [children.append(Children(x.name, x.id, x.project_id, x.folder_id, 1, 0)) for x in activity_list]
-    [children.append(Children(x.name, x.id, 'Root', 0, 0, 0)) for x in project_list]
+    [children.append(Children(x.name, x.id, x.project_id, x.parent_id, 0, 1,'')) for x in folder_list]
+    [children.append(Children(x.name+' ', x.id, x.project_id, x.folder_id, 1, 0, x.description)) for x in activity_list]
+    [children.append(Children(x.name, x.id, 'Root', 0, 0, 0, x.description)) for x in project_list]
+
+    for c in children:
+        print c.name
 
     root_nodes = {x for x in children if x.project_id == 0}
     links = []
@@ -176,6 +168,7 @@ def folder():
             d["text"] = node.name
             d["isActivity"] = node.isActivity
             d["isFolder"] = node.isFolder
+            d["description"] = node.description
 
         getchildren = get_children(node)
         if getchildren:
@@ -192,8 +185,47 @@ def folder():
                 return [x for x in children if x.parent_id == node.id]
 
     tree = get_nodes("Root")
-    
-    return render_template("folder.html", data=tree)
+    tree2 = get_nodes("Root")
+
+    #print tree['nodes'][0]
+
+    listall = []
+
+    def getNodes(node):
+        for node in node['nodes']:
+            try:
+                listall.append(node)
+                getNodes(node)
+            except:
+                print ''
+
+
+    #print len(tree['nodes'])
+
+    def getEmpty(node):
+        for n in node['nodes']:
+            if n['isActivity'] != 1:
+                try:
+                    tmp = n
+                    getEmpty(n)
+                except:
+                    n['text'] = 'Tom'
+
+    getNodes(tree2)
+    #print tree2
+
+    try:
+        struct = request.form['struct']
+        p = ast.literal_eval(struct)
+
+        if p['isActivity'] == 1:
+            return render_template("folder.html", back="true", all=listall)
+        else:
+            return render_template("folder.html", data=p, back="true", all=listall)
+    except:
+        print ''
+
+    return render_template("folder.html", data=tree2, all=listall)
 
 
 @app.route('/change')

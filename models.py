@@ -98,6 +98,7 @@ class Folder(db.Model):
         return self.name
 
 
+
 # ActivityTest class
 class ActivityTest(db.Model):
 
@@ -114,22 +115,22 @@ class ActivityTest(db.Model):
         return self.name
 
 
-# Change class
-class Change(db.Model):
+# # Change class
+# class Change(db.Model):
+#
+#     id = db.Column(db.Integer, primary_key=True)
+#     description = db.Column(db.String(255), nullable=False)
+#     activity_test_id = db.Column(db.Integer, db.ForeignKey('activity_test.id'))
+#     activity_test = relationship(ActivityTest, backref='change')
 
-    id = db.Column(db.Integer, primary_key=True)
-    description = db.Column(db.String(255), nullable=False)
-    activity_test_id = db.Column(db.Integer, db.ForeignKey('activity_test.id'))
-    activity_test = relationship(ActivityTest, backref='change')
 
-
-# Image class
-class Image(db.Model):
-
-    id = db.Column(db.Integer, primary_key=True)
-    path = db.Column(db.String(255), nullable=False)
-    change_id = db.Column(db.Integer, db.ForeignKey('change.id'))
-    change = relationship(Change, backref='image')
+# # Image class
+# class Image(db.Model):
+#
+#     id = db.Column(db.Integer, primary_key=True)
+#     path = db.Column(db.String(255), nullable=False)
+#     change_id = db.Column(db.Integer, db.ForeignKey('change.id'))
+#     change = relationship(Change, backref='image')
 
 
 # Initialize the SQLAlchemy data store and Flask-Security.
