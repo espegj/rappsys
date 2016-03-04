@@ -24,6 +24,12 @@ activities_users = db.Table(
     db.Column('activity_id', db.Integer(), db.ForeignKey('activity_test.id'))
 )
 
+shortdesc_change = db.Table(
+    'shortdesc_change',
+    db.Column('change_id', db.Integer(), db.ForeignKey('change.id')),
+    db.Column('shortdesc_id', db.Integer(), db.ForeignKey('shortdesc.id'))
+)
+
 
 # Role class
 class Role(db.Model, RoleMixin):
@@ -115,22 +121,35 @@ class ActivityTest(db.Model):
         return self.name
 
 
-# # Change class
-# class Change(db.Model):
-#
-#     id = db.Column(db.Integer, primary_key=True)
-#     description = db.Column(db.String(255), nullable=False)
-#     activity_test_id = db.Column(db.Integer, db.ForeignKey('activity_test.id'))
-#     activity_test = relationship(ActivityTest, backref='change')
+# Change class
+class Change(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+    description = db.Column(db.String(255), nullable=False)
+    activity_test_id = db.Column(db.Integer, db.ForeignKey('activity_test.id'))
+    activity_test = relationship(ActivityTest, backref='change')
+
+    shortdescs = db.relationship(
+        'Shortdesc',
+        secondary=shortdesc_change,
+        backref=db.backref('change', lazy='dynamic')
+    )
+
+class Shortdesc(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+
+    def __str__(self):
+        return self.name
 
 
-# # Image class
-# class Image(db.Model):
-#
-#     id = db.Column(db.Integer, primary_key=True)
-#     path = db.Column(db.String(255), nullable=False)
-#     change_id = db.Column(db.Integer, db.ForeignKey('change.id'))
-#     change = relationship(Change, backref='image')
+# Image class
+class Image(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+    path = db.Column(db.String(255), nullable=False)
+    change_id = db.Column(db.Integer, db.ForeignKey('change.id'))
+    change = relationship(Change, backref='image')
 
 
 # Initialize the SQLAlchemy data store and Flask-Security.

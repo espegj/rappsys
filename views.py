@@ -2,7 +2,7 @@ from flask import render_template, request, url_for, redirect, g, flash, session
 from flask.ext.security import current_user, login_required, roles_required, roles_accepted, utils
 from flask_mail import Mail, Message
 from uuid import uuid4
-import random, string, hashlib, os, json, glob, ast
+import random, string, hashlib, os, json, glob, ast, MySQLdb
 from __init__ import app, db, mail
 from admin import *
 
@@ -169,6 +169,7 @@ def folder():
             d["isActivity"] = node.isActivity
             d["isFolder"] = node.isFolder
             d["description"] = node.description
+            d["id"] = node.id
 
         getchildren = get_children(node)
         if getchildren:
@@ -214,12 +215,14 @@ def folder():
     getNodes(tree2)
     #print tree2
 
+    shortdesc_list = db.session.query(Shortdesc).all()
+
     try:
         struct = request.form['struct']
         p = ast.literal_eval(struct)
 
         if p['isActivity'] == 1:
-            return render_template("folder.html", back="true", all=listall)
+            return render_template("folder.html", back="true", all=listall, info=p, shortlist=shortdesc_list)
         else:
             return render_template("folder.html", data=p, back="true", all=listall)
     except:
@@ -239,6 +242,8 @@ def change():
 @app.route("/upload", methods=["POST"])
 def upload():
     form = request.form
+    test = request.files.getlist("file")
+    print test
 
     # Create a unique "session ID" for this particular batch of uploads.
     upload_key = str(uuid4())
@@ -260,12 +265,16 @@ def upload():
 
     activity_id = form.get('activity_id')
     text = form.get('textarea')
-    mod = Change(description=text, activity_id=activity_id)
+    sd_id = form.get('short_desc')
+    shortdesc = db.session.query(Shortdesc).filter(Shortdesc.id == sd_id).all()
+    mod = Change(description=text, activity_test_id=activity_id)
+    mod.shortdescs = shortdesc
     db.session.add(mod)
     db.session.commit()
     change_id = mod.id
 
     for upload in request.files.getlist("file"):
+        print "jeg er her"
         filename = upload.filename.rsplit("/")[0]
         destination = "/".join([target, filename])
         upload.save(destination)
@@ -278,7 +287,7 @@ def upload():
         return ajax_response(True, upload_key)
     else:
         return redirect(url_for("upload_complete", uuid=upload_key))
-
+    return redirect("javascript:history.back()")
 
 @app.route("/files/<uuid>")
 def upload_complete(uuid):

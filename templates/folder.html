@@ -151,16 +151,50 @@
 
             {% else %}
             <div class="row">
-                <div class="col-md-6">
-                    <div class="blue"><h1 class="white text-center"><i class="fa fa-plus"></i></h1></div>
-                </div>
-                <div class="col-md-6">
-                    <div class="red"><h1 class="white text-center"><i class="fa fa-minus"></i></h1></div>
+                <div class="col-md-12 text-center">
+                    <h3>{{info.text}}</h3>
+                    <p>{{info.description}}</p>
+                    <hr>
+                    <h4>Registrer endring</h4>
+                    <form id="upload-form" action="{{ url_for('upload') }}"  method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="activity_id" value={{info.id}}>
+                        <div class="col-md-6">
+                            <!--<div class="blue"><h1 class="white text-center"><i class="fa fa-plus"></i></h1></div>-->
+                            <p>Hva omfatter endringen?</p>
+                            <select class="form-control" name="short_desc">
+                                {% for x in shortlist %}
+                                    <option value="{{x.id}}">{{x.name}}</option>
+                                {% endfor %}
+                            </select>
+                            <br>
+                            <input id="file-picker" name="file" accept="image/*" type="file" class="filestyle form-control" data-input="false" data-buttonText="Velg bilde for opplasting" multiple>
+                            <br>
+                        </div>
+                        <div class="col-md-6">
+                            <!--<div class="red"><h1 class="white text-center"><i class="fa fa-minus"></i></h1></div>-->
+                            <textarea class="form-control" rows="4" cols="40" name="textarea" placeholder="Eventuell kort forklaring..."></textarea><p><br/>
+                        </div>
+                        <div class="col-md-12">
+                            <fieldset id="progress" style="display: none">
+                                <legend>Files Progress</legend>
+                                <div class="progress-trough">
+                                    <div id="progress-bar" class="progress-bar">0%</div>
+                                </div>
+                            </fieldset>
+                            <br>
+                            <button type="submit" class="ladda-button" data-color="blue" data-size="xs" data-style="slide-up">
+                                <span>Lagre endringer</span>
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
             {% endif %}
         </div>
     </div>
 </div>
+<script src="/static/js/uploadr.js" type="text/javascript"></script>
+<script src="/static/js/upload-alert.js" type="text/javascript"></script>
 <script src="/static/js/app.js" type="text/javascript"></script>
+
 {% endblock %}
