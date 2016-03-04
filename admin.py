@@ -97,8 +97,22 @@ class MyView(BaseView):
 class Changes(BaseView):
     @expose('/')
     def index(self):
-        list = db.session.query(ActivityTest).all()
-        return self.render('admin/changes.html', data=list)
+        list = db.session.query(Change).join(Shortdesc)\
+            .filter(Shortdesc.id == Change.shortdescs_id).join(ActivityTest).filter(Change.activity_test_id==ActivityTest.id)\
+            .join(Project).filter(ActivityTest.project_id == Project.id)\
+            .join(Image).filter(Change.id == Image.change_id).all()
+
+        listAll=[]
+        for x in list:
+            list=[]
+            list.append(x.activity_test.name)
+            list.append(x.activity_test.project.name)
+            list.append(x.description)
+            list.append(x.shortdescs[0].name)
+            list.append(x.image[0].path)
+            listAll.append(list)
+
+        return self.render('admin/changes.html', data=listAll)
 
 # Initialize Flask-Admin
 admin = Admin(app, base_template='layout.html', template_mode='bootstrap3')

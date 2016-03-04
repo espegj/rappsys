@@ -17,6 +17,13 @@ projects_users = db.Table(
     db.Column('project_id', db.Integer(), db.ForeignKey('project.id'))
 )
 
+# Create a table to support a many-to-many relationship between Managers and Projects
+projects_managers = db.Table(
+    'projects_managers',
+    db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
+    db.Column('project_id', db.Integer(), db.ForeignKey('project.id'))
+)
+
 # Create a table to support a many-to-many relationship between Users and Activities
 activities_users = db.Table(
     'activities_users',
@@ -70,6 +77,11 @@ class User(db.Model, UserMixin):
         secondary=projects_users,
         backref=db.backref('users', lazy='dynamic')
     )
+    projects_manager = db.relationship(
+        'Project',
+        secondary=projects_managers,
+        backref=db.backref('managers', lazy='dynamic')
+    )
     activities = db.relationship(
         'ActivityTest',
         secondary=activities_users,
@@ -122,6 +134,13 @@ class ActivityTest(db.Model):
         return self.name
 
 
+# Image class
+class Image(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+    path = db.Column(db.String(255), nullable=False)
+    change_id = db.Column(db.Integer, db.ForeignKey('change.id'))
+
 
 # Change class
 class Change(db.Model):
@@ -129,7 +148,9 @@ class Change(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     description = db.Column(db.String(255), nullable=False)
     activity_test_id = db.Column(db.Integer, db.ForeignKey('activity_test.id'))
+    shortdescs_id = db.Column(db.Integer, db.ForeignKey('shortdesc.id'))
     activity_test = relationship(ActivityTest, backref='change')
+    image = relationship(Image, backref='change')
     shortdescs = db.relationship(
         'Shortdesc',
         secondary=shortdesc_change,
@@ -155,13 +176,7 @@ class Shortdesc(db.Model):
         return self.name
 
 
-# Image class
-class Image(db.Model):
 
-    id = db.Column(db.Integer, primary_key=True)
-    path = db.Column(db.String(255), nullable=False)
-    change_id = db.Column(db.Integer, db.ForeignKey('change.id'))
-    change = relationship(Change, backref='image')
 
 
 # Initialize the SQLAlchemy data store and Flask-Security.

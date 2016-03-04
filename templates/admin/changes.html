@@ -27,11 +27,11 @@
   <tbody class="list">
   {% for x in data %}
     <tr>
-      <td class="name">{{ x.id }}</td>
-      <td class="description">{{ x.name }}</td>
-      <td>{{ x.description }}</td>
-      <td>{{ x.quantity }}</td>
-      <td><a href="">vis bilde</a></td>
+      <td class="name">{{ x[0] }}</td>
+      <td class="description">{{ x[2] }}</td>
+      <td>{{ x[1] }}</td>
+      <td>{{ x[3] }}</td>
+      <td><a href="/{{ x[4] }}">vis bilde</a></td>
     </tr>
   {% endfor %}
   </tbody>

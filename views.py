@@ -149,9 +149,6 @@ def folder():
     [children.append(Children(x.name+' ', x.id, x.project_id, x.folder_id, 1, 0, x.description)) for x in activity_list]
     [children.append(Children(x.name, x.id, 'Root', 0, 0, 0, x.description)) for x in project_list]
 
-    for c in children:
-        print c.name
-
     root_nodes = {x for x in children if x.project_id == 0}
     links = []
     for node in root_nodes:
@@ -240,7 +237,6 @@ def change():
 def upload():
     form = request.form
     test = request.files.getlist("file")
-    print test
 
     # Create a unique "session ID" for this particular batch of uploads.
     upload_key = str(uuid4())
@@ -264,13 +260,13 @@ def upload():
     text = form.get('textarea')
     sd_id = form.get('short_desc')
     shortdesc = db.session.query(Shortdesc).filter(Shortdesc.id == sd_id).all()
-    mod = Change(description=text, activity_test_id=activity_id)
+    mod = Change(description=text, activity_test_id=activity_id, shortdescs_id=shortdesc[0].id)
     mod.shortdescs = shortdesc
     db.session.add(mod)
     db.session.commit()
     change_id = mod.id
 
-    for upload in request.files.getlist("file"):
+    for upload in test:
         print "jeg er her"
         filename = upload.filename.rsplit("/")[0]
         destination = "/".join([target, filename])
