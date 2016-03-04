@@ -80,9 +80,6 @@ def set_new_password():
         return None
 
 
-
-
-
 @app.route('/activities')
 @roles_accepted('end-user', 'admin')
 def activities():

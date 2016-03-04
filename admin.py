@@ -97,7 +97,8 @@ class MyView(BaseView):
 class Changes(BaseView):
     @expose('/')
     def index(self):
-        return self.render('admin/changes.html')
+        list = db.session.query(ActivityTest).all()
+        return self.render('admin/changes.html', data=list)
 
 # Initialize Flask-Admin
 admin = Admin(app, base_template='layout.html', template_mode='bootstrap3')
