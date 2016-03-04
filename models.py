@@ -126,6 +126,16 @@ class ProcessCode(db.Model):
         return self.id
 
 
+# Unit class
+class Unit(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+
+    def __str__(self):
+        return self.name
+
+
 # ActivityTest class
 class ActivityTest(db.Model):
 
@@ -139,6 +149,7 @@ class ActivityTest(db.Model):
     project = relationship(Project, backref='ActivityTest')
     folder = relationship(Folder, backref='ActivityTest')
     processcode = relationship(ProcessCode, backref='ActivityTest')
+    unit = relationship(Unit, backref='ActivityTest')
 
     def __str__(self):
         return self.name
@@ -170,15 +181,6 @@ class Change(db.Model):
         backref=db.backref('change', lazy='dynamic')
     )
 
-# Unit class
-class Unit(db.Model):
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(255), nullable=False)
-    activity = relationship(ActivityTest, backref='Unit')
-
-    def __str__(self):
-        return self.name
 
 
 class Shortdesc(db.Model):

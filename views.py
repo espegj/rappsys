@@ -130,7 +130,8 @@ def folder():
     activity_list = []
     for x in folder_id_list:
         activity_list.extend(db.session.query(ActivityTest).join(User.activities).filter(User.id == user_id).\
-        filter(ActivityTest.project_id == x).join(ActivityTest.processcode).filter(ProcessCode.id == ActivityTest.name).all())
+        filter(ActivityTest.project_id == x).join(ActivityTest.processcode).filter(ProcessCode.id == ActivityTest.name).\
+        join(ActivityTest.unit).filter(ActivityTest.unit_id == Unit.id).all())
         # activity_list.extend(db.session.query(ActivityTest).filter(ActivityTest.project_id == x).all())
 
     class Children(object):
@@ -146,7 +147,8 @@ def folder():
 
     children = []
     [children.append(Children(x.name, x.id, x.project_id, x.parent_id, 0, 1,'')) for x in folder_list]
-    [children.append(Children(x.name+' ', x.id, x.project_id, x.folder_id, 1, 0, x.processcode.name)) for x in activity_list]
+    [children.append(Children(x.name+' ', x.id, x.project_id, x.folder_id, 1, 0, str(x.processcode.name + ' - ' +
+            x.quantity + ' ' + x.unit.name))) for x in activity_list]
     [children.append(Children(x.name, x.id, 'Root', 0, 0, 0, x.description)) for x in project_list]
 
     root_nodes = {x for x in children if x.project_id == 0}
