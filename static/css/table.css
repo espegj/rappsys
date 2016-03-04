@@ -1,0 +1,7 @@
+.padd{
+    margin-bottom: 10px;
+}
+
+.test tr:nth-child(even){
+		background: #E6EFFF;
+	}

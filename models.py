@@ -98,7 +98,6 @@ class Folder(db.Model):
         return self.name
 
 
-
 # ActivityTest class
 class ActivityTest(db.Model):
 
@@ -106,10 +105,23 @@ class ActivityTest(db.Model):
     name = db.Column(db.String(255), nullable=False)
     description = db.Column(db.String(255), nullable=False)
     isActivity = db.Column(db.Integer)
+    quantity = db.Column(db.String(255))
+    unit_id = db.Column(db.Integer, db.ForeignKey('unit.id'))
     folder_id = db.Column(db.Integer, db.ForeignKey('folder.id'))
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
     project = relationship(Project, backref='ActivityTest')
     folder = relationship(Folder, backref='ActivityTest')
+
+    def __str__(self):
+        return self.name
+
+
+# Unit class
+class Unit(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    activity = relationship(ActivityTest, backref='Unit')
 
     def __str__(self):
         return self.name
