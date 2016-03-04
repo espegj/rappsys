@@ -97,10 +97,13 @@ class MyView(BaseView):
 class Changes(BaseView):
     @expose('/')
     def index(self):
-        list = db.session.query(Change).join(Shortdesc)\
-            .filter(Shortdesc.id == Change.shortdescs_id).join(ActivityTest).filter(Change.activity_test_id==ActivityTest.id)\
+        list = db.session.query(Change)\
+            .join(Shortdesc).filter(Shortdesc.id == Change.shortdescs_id)\
+            .join(ActivityTest).filter(Change.activity_test_id==ActivityTest.id)\
             .join(Project).filter(ActivityTest.project_id == Project.id)\
-            .join(Image).filter(Change.id == Image.change_id).all()
+            .join(Image).filter(Change.id == Image.change_id)\
+            .join(User).filter(Change.user_id == User.id)\
+            .order_by(-Change.time).all()
 
         listAll=[]
         for x in list:
@@ -110,6 +113,7 @@ class Changes(BaseView):
             list.append(x.description)
             list.append(x.shortdescs[0].name)
             list.append(x.image[0].path)
+            list.append(x.user.email)
             listAll.append(list)
 
         return self.render('admin/changes.html', data=listAll)

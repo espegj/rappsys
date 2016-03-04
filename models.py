@@ -1,6 +1,7 @@
 from __init__ import db, app
 from sqlalchemy.orm import relationship
 from flask.ext.security import RoleMixin, UserMixin, SQLAlchemyUserDatastore, Security
+import datetime
 
 
 # Create a table to support a many-to-many relationship between Users and Roles
@@ -147,10 +148,13 @@ class Change(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     description = db.Column(db.String(255), nullable=False)
+    time = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     activity_test_id = db.Column(db.Integer, db.ForeignKey('activity_test.id'))
     shortdescs_id = db.Column(db.Integer, db.ForeignKey('shortdesc.id'))
     activity_test = relationship(ActivityTest, backref='change')
     image = relationship(Image, backref='change')
+    user = relationship(User, backref='user')
     shortdescs = db.relationship(
         'Shortdesc',
         secondary=shortdesc_change,

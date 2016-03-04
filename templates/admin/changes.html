@@ -17,9 +17,10 @@
     <table class="table table-bordered test">
   <thead bgcolor="#2c7bb2">
     <tr style="color:white">
-      <th><span style="font-weight: normal;">Endring</span></th>
       <th><span style="font-weight: normal;">Prosjekt</span></th>
       <th><span style="font-weight: normal;">Aktivitet</span></th>
+      <th><span style="font-weight: normal;">Kommentar</span></th>
+      <th><span style="font-weight: normal;">Beskrivelse</span></th>
       <th><span style="font-weight: normal;">Bruker</span></th>
       <th><span style="font-weight: normal;">Bilde</span></th>
     </tr>
@@ -27,10 +28,11 @@
   <tbody class="list">
   {% for x in data %}
     <tr>
-      <td class="name">{{ x[0] }}</td>
-      <td class="description">{{ x[2] }}</td>
-      <td>{{ x[1] }}</td>
-      <td>{{ x[3] }}</td>
+      <td class="name">{{ x[1] }}</td>
+      <td class="activity">{{ x[0] }}</td>
+      <td class="comment">{{ x[2] }}</td>
+      <td class="desc">{{ x[3] }}</td>
+      <td class="user">{{ x[5] }}</td>
       <td><a href="/{{ x[4] }}">vis bilde</a></td>
     </tr>
   {% endfor %}

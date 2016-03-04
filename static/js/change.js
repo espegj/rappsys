@@ -1,5 +1,5 @@
 var options = {
-  valueNames: [ 'name', 'description']
+  valueNames: [ 'name', 'description', 'comment', 'desc', 'user']
 };
 var projectList = new List('projects', options);
 

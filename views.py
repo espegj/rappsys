@@ -179,8 +179,11 @@ def folder():
             if node.isActivity == 0:
                 return [x for x in children if x.parent_id == node.id]
 
-    tree = get_nodes("Root")
-    tree2 = get_nodes("Root")
+    #tree = get_nodes("Root")
+    try:
+        tree2 = get_nodes("Root")
+    except:
+        return render_template("folder.html", empty=True)
 
     #print tree['nodes'][0]
 
@@ -206,7 +209,10 @@ def folder():
                 except:
                     n['text'] = 'Tom'
 
-    getNodes(tree2)
+    try:
+        getNodes(tree2)
+    except:
+        return render_template("folder.html", empty=True)
     #print tree2
 
     shortdesc_list = db.session.query(Shortdesc).all()
@@ -260,7 +266,7 @@ def upload():
     text = form.get('textarea')
     sd_id = form.get('short_desc')
     shortdesc = db.session.query(Shortdesc).filter(Shortdesc.id == sd_id).all()
-    mod = Change(description=text, activity_test_id=activity_id, shortdescs_id=shortdesc[0].id)
+    mod = Change(description=text, activity_test_id=activity_id, shortdescs_id=shortdesc[0].id, user_id=current_user.id)
     mod.shortdescs = shortdesc
     db.session.add(mod)
     db.session.commit()
