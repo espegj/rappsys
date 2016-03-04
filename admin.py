@@ -81,8 +81,29 @@ class FolderAdmin(sqla.ModelView):
 # Customized Project model for SQL-Admin
 class ActivityAdmin(sqla.ModelView):
     column_auto_select_related = True
+    column_exclude_list = ('isActivity', 'change',)
+    form_excluded_columns = ('isActivity', 'change',)
+
+    # Prevent administration of Project unless the currently logged-in user has the "admin" role
+    def is_accessible(self):
+        return current_user.has_role('admin')
+
+
+class UnitAdmin(sqla.ModelView):
+    column_auto_select_related = True
     column_exclude_list = ('activity',)
     form_excluded_columns = ('activity',)
+
+    # Prevent administration of Project unless the currently logged-in user has the "admin" role
+    def is_accessible(self):
+        return current_user.has_role('admin')
+
+
+class ShortdescAdmin(sqla.ModelView):
+    column_auto_select_related = True
+    column_exclude_list = ('change', 'change',)
+    form_excluded_columns = ('change', 'change',)
+
     # Prevent administration of Project unless the currently logged-in user has the "admin" role
     def is_accessible(self):
         return current_user.has_role('admin')
@@ -130,6 +151,8 @@ admin.add_view(RoleAdmin(Role, db.session))
 admin.add_view(ProjectAdmin(Project, db.session))
 admin.add_view(FolderAdmin(Folder, db.session))
 admin.add_view(ActivityAdmin(ActivityTest, db.session))
+admin.add_view(UnitAdmin(Unit, db.session))
+admin.add_view(ShortdescAdmin(Shortdesc, db.session))
 
 
 

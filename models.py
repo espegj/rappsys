@@ -117,19 +117,28 @@ class Folder(db.Model):
         return self.name
 
 
+# ProcessCode class
+class ProcessCode(db.Model):
+    id = db.Column(db.String(45), primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+
+    def __str__(self):
+        return self.id
+
+
 # ActivityTest class
 class ActivityTest(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(255), nullable=False)
-    description = db.Column(db.String(255), nullable=False)
-    isActivity = db.Column(db.Integer)
+    name = db.Column(db.String(255), db.ForeignKey('process_code.id'))
+    isActivity = db.Column(db.Integer, default=1)
     quantity = db.Column(db.String(255))
     unit_id = db.Column(db.Integer, db.ForeignKey('unit.id'))
     folder_id = db.Column(db.Integer, db.ForeignKey('folder.id'))
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
     project = relationship(Project, backref='ActivityTest')
     folder = relationship(Folder, backref='ActivityTest')
+    processcode = relationship(ProcessCode, backref='ActivityTest')
 
     def __str__(self):
         return self.name
@@ -178,6 +187,7 @@ class Shortdesc(db.Model):
 
     def __str__(self):
         return self.name
+
 
 
 

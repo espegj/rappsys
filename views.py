@@ -130,7 +130,7 @@ def folder():
     activity_list = []
     for x in folder_id_list:
         activity_list.extend(db.session.query(ActivityTest).join(User.activities).filter(User.id == user_id).\
-        filter(ActivityTest.project_id == x).all())
+        filter(ActivityTest.project_id == x).join(ActivityTest.processcode).filter(ProcessCode.id == ActivityTest.name).all())
         # activity_list.extend(db.session.query(ActivityTest).filter(ActivityTest.project_id == x).all())
 
     class Children(object):
@@ -146,7 +146,7 @@ def folder():
 
     children = []
     [children.append(Children(x.name, x.id, x.project_id, x.parent_id, 0, 1,'')) for x in folder_list]
-    [children.append(Children(x.name+' ', x.id, x.project_id, x.folder_id, 1, 0, x.description)) for x in activity_list]
+    [children.append(Children(x.name+' ', x.id, x.project_id, x.folder_id, 1, 0, x.processcode.name)) for x in activity_list]
     [children.append(Children(x.name, x.id, 'Root', 0, 0, 0, x.description)) for x in project_list]
 
     root_nodes = {x for x in children if x.project_id == 0}
@@ -273,7 +273,6 @@ def upload():
     change_id = mod.id
 
     for upload in test:
-        print "jeg er her"
         filename = upload.filename.rsplit("/")[0]
         destination = "/".join([target, filename])
         upload.save(destination)
