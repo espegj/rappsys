@@ -5,6 +5,7 @@ from uuid import uuid4
 import random, string, hashlib, os, json, glob, ast, MySQLdb
 from __init__ import app, db, mail
 from admin import *
+from sendMail import *
 
 
 # Displays the home page.
@@ -19,6 +20,7 @@ def index():
 @app.route('/test')
 # @roles_accepted('end-user', 'admin')
 def test():
+    senMail()
     return utils.encrypt_password('123456')
 
 
@@ -146,9 +148,8 @@ def folder():
 
 
     children = []
-    [children.append(Children(x.name, x.id, x.project_id, x.parent_id, 0, 1,'')) for x in folder_list]
-    [children.append(Children(x.name+' ', x.id, x.project_id, x.folder_id, 1, 0, str(x.processcode.name + ' - ' +
-            x.quantity + ' ' + x.unit.name))) for x in activity_list]
+    [children.append(Children(x.name, x.id, x.project_id, x.parent_id, 0, 1, '')) for x in folder_list]
+    [children.append(Children(x.name, x.id, x.project_id, x.folder_id, 1, 0, str(x.processcode.name + ' - ' + x.quantity+' '+ x.unit.name))) for x in activity_list]
     [children.append(Children(x.name, x.id, 'Root', 0, 0, 0, x.description)) for x in project_list]
 
     root_nodes = {x for x in children if x.project_id == 0}
@@ -193,11 +194,13 @@ def folder():
 
     def getNodes(node):
         for node in node['nodes']:
+            listall.append(node)
+            print node
+            print ''
             try:
-                listall.append(node)
                 getNodes(node)
             except:
-                print ''
+                print 'no nodes'
 
 
     #print len(tree['nodes'])
@@ -215,7 +218,6 @@ def folder():
         getNodes(tree2)
     except:
         return render_template("folder.html", empty=True)
-    #print tree2
 
     shortdesc_list = db.session.query(Shortdesc).all()
 

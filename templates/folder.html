@@ -21,7 +21,7 @@
 
     <div class="row">
         {% if empty %}
-            <h2 class="text-center">Ingen elementer</h2>
+        <h2 class="text-center">Ingen elementer</h2>
         {% endif %}
         <div class="col-md-8 col-md-offset-2">
             <ul class="list-group list">
@@ -82,7 +82,7 @@
                 {% for x in all %}
                 {% if x.isFolder == 1%}
                 <form id="{{x}}" action="folder" method="POST">
-                    <div data-filter="{{x.text}}" class="test green list-group-item li el" id="{{ x }}"
+                    <div data-filter="" class="test green list-group-item li el" id="{{ x }}"
                          onclick="submit(this.id)" style="display:none;">
                         <div class="row">
                             <input name="struct" value="{{x}}" hidden="true">
@@ -97,7 +97,7 @@
                 </form>
                 {% elif x.isActivity == 1%}
                 <form id="{{x}}" action="folder" method="POST">
-                    <div data-filterdata-filter="{{x.text}}" class="test red list-group-item li el" id="{{ x }}"
+                    <div data-filter="" class="test red list-group-item li el" id="{{ x }}"
                          onclick="submit(this.id)" style="display:none;">
                         <div class="row">
                             <input name="struct" value="{{x}}" hidden="true">
@@ -115,7 +115,7 @@
                 {% else %}
                 {% if back %}
                 <form id="{{x}}" action="folder" method="POST">
-                    <div data-filter="{{x.text}}" class="test blue list-group-item li el" id="{{ x }}"
+                    <div data-filter="" class="test blue list-group-item li el" id="{{ x }}"
                          onclick="submit(this.id)" style="display:none;">
                         <div class="row">
                             <input name="struct" value="{{x}}" hidden="true">
@@ -131,8 +131,8 @@
                     </div>
                 </form>
                 {% else %}
-                             <form id="{{x}}" action="folder" method="POST">
-                    <div data-filter="{{x.text}}" class="test blue list-group-item li" id="{{ x }}"
+                <form id="{{x}}" action="folder" method="POST">
+                    <div data-filter="" class="test blue list-group-item li" id="{{ x }}"
                          onclick="submit(this.id)">
                         <div class="row">
                             <input name="struct" value="{{x}}" hidden="true">
@@ -160,27 +160,32 @@
                     <p>{{info.description}}</p>
                     <hr>
                     <br>
-                    <form id="upload-form" action="{{ url_for('upload') }}"  method="POST" enctype="multipart/form-data">
+                    <form id="upload-form" action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
                         <div class="col-md-12">
                             <input type="hidden" name="activity_id" value={{info.id}}>
                             <!--<div class="blue"><h1 class="white text-center"><i class="fa fa-plus"></i></h1></div>-->
                             <select class="form-control" name="short_desc">
                                 <option value="" disabled selected>Hva omfatter endringen?</option>
                                 {% for x in shortlist %}
-                                    <option value="{{x.id}}">{{x.name}}</option>
+                                <option value="{{x.id}}">{{x.name}}</option>
                                 {% endfor %}
                             </select>
                             <br>
                             <!--<label for="file-picker" class="custom-file-upload">-->
-                                <!--<i class="fa fa-camera-retro fa-5x"></i> Custom Upload-->
+                            <!--<i class="fa fa-camera-retro fa-5x"></i> Custom Upload-->
                             <!--</label>-->
-                            <input id="file-picker" name="file" accept="image/*" type="file" class="filestyle form-control" data-input="false" data-buttonText="Velg bilde for opplasting" multiple>
+                            <input id="file-picker" name="file" accept="image/*" type="file"
+                                   class="filestyle form-control" data-input="false"
+                                   data-buttonText="Velg bilde for opplasting" multiple>
                             <br>
                             <!--<div class="red"><h1 class="white text-center"><i class="fa fa-minus"></i></h1></div>-->
-                            <textarea class="form-control" rows="4" cols="40" name="textarea" placeholder="Eventuell kort forklaring..."></textarea><p><br/>
+                            <textarea class="form-control" rows="4" cols="40" name="textarea"
+                                      placeholder="Eventuell kort forklaring..."></textarea>
+                            <p><br/>
                         </div>
                         <div class="col-md-12">
-                            <button type="submit" class="ladda-button" data-color="blue" data-size="Extra Large" data-style="slide-up">
+                            <button type="submit" class="ladda-button" data-color="blue" data-size="Extra Large"
+                                    data-style="slide-up">
                                 <span>Lagre endringer</span>
                             </button>
                         </div>
