@@ -8,19 +8,10 @@ from admin import *
 from sendMail import *
 
 
-# Displays the home page.
-@app.route('/')
-# Users must be authenticated to view the home page, but they don't have to have any particular role.
-# Flask-Security will display a login form if the user isn't already authenticated.
-@login_required
-def index():
-    return render_template('index.html')
-
-
 @app.route('/test')
 # @roles_accepted('end-user', 'admin')
 def test():
-    senMail()
+    #senMail()
     return utils.encrypt_password('123456')
 
 
@@ -118,9 +109,12 @@ def activity():
     return render_template("activity.html", activity=activity, activity_id=activity_id)
 
 
-@app.route('/folder', methods=['GET', 'POST'])
-@roles_accepted('end-user', 'admin')
-def folder():
+# Displays the home page.
+@app.route('/')
+@app.route('/index', methods=['GET', 'POST'])
+@login_required
+# @roles_accepted('end-user', 'admin')
+def index():
     user_id = current_user.id
     project_list = db.session.query(Project).join(User.projects).filter(User.id == user_id).all()
 
@@ -186,7 +180,7 @@ def folder():
     try:
         tree2 = get_nodes("Root")
     except:
-        return render_template("folder.html", empty=True)
+        return render_template("index.html", empty=True)
 
     #print tree['nodes'][0]
 
@@ -217,7 +211,7 @@ def folder():
     try:
         getNodes(tree2)
     except:
-        return render_template("folder.html", empty=True)
+        return render_template("index.html", empty=True)
 
     shortdesc_list = db.session.query(Shortdesc).all()
 
@@ -226,13 +220,13 @@ def folder():
         p = ast.literal_eval(struct)
 
         if p['isActivity'] == 1:
-            return render_template("folder.html", back="true", all=listall, info=p, shortlist=shortdesc_list)
+            return render_template("index.html", back="true", all=listall, info=p, shortlist=shortdesc_list)
         else:
-            return render_template("folder.html", data=p, back="true", all=listall)
+            return render_template("index.html", data=p, back="true", all=listall)
     except:
         print ''
 
-    return render_template("folder.html", data=tree2, all=listall)
+    return render_template("index.html", data=tree2, all=listall)
 
 
 @app.route('/change')
