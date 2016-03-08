@@ -5,7 +5,7 @@ from uuid import uuid4
 import random, string, hashlib, os, json, glob, ast, MySQLdb
 from __init__ import app, db, mail
 from admin import *
-from sendMail import *
+#from sendMail import *
 
 
 @app.route('/test')
