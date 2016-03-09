@@ -11,60 +11,6 @@ from sendMail import *
 @app.route('/test')
 # @roles_accepted('end-user', 'admin')
 def test():
-    class MailInfo(object):
-        def __init__(self, desc=None, shortdesc=None, project_name=None, activity=None, user=None, project_id=None):
-            self.desc = desc
-            self.shortdesc = shortdesc
-            self.project_name = project_name
-            self.activity = activity
-            self.user = user
-            self.project_id = project_id
-
-
-    #Mail to manager
-    list = db.session.query(Change)\
-            .join(Shortdesc).filter(Shortdesc.id == Change.shortdescs_id)\
-            .join(ActivityTest).filter(Change.activity_test_id==ActivityTest.id)\
-            .join(Project).filter(ActivityTest.project_id == Project.id)\
-            .join(Image).filter(Change.id == Image.change_id)\
-            .join(User).filter(Change.user_id == User.id)\
-            .order_by(-Change.time).all()
-
-    mail = []
-    [mail.append(MailInfo(x.description, x.shortdescs[0].name, x.activity_test.project.name,
-                          x.activity_test.name, x.user.email, x.activity_test.project.id)) for x in list]
-
-    def getKey(custom):
-        return custom.project_id
-
-    mail = sorted(mail, key=getKey)
-
-    id = mail[0].project_id
-    infoAll = []
-    for x in mail:
-        if id == x.project_id:
-            manager = db.session.query(User).join(User.projects_manager).filter(Project.id == id).all()
-            managerList = []
-            info = []
-            for m in manager:
-                managerList.append(m.email)
-
-            info.append(x.desc)
-            info.append(x.shortdesc)
-            info.append(x.project_name)
-            info.append(x.activity)
-            info.append(str(x.user).split('@', 1)[0])
-            infoAll.append(info)
-        else:
-            for m in managerList:
-                senMail(m, infoAll)
-            id = x.project_id
-            infoAll = []
-
-    for m in managerList:
-        senMail(m, infoAll)
-
-
     return 'Mail sendt'
 
 
@@ -329,6 +275,60 @@ def upload():
         db.session.add(img)
 
     db.session.commit()
+
+    class MailInfo(object):
+        def __init__(self, desc=None, shortdesc=None, project_name=None, activity=None, user=None, project_id=None):
+            self.desc = desc
+            self.shortdesc = shortdesc
+            self.project_name = project_name
+            self.activity = activity
+            self.user = user
+            self.project_id = project_id
+
+
+    #Mail to manager
+    list = db.session.query(Change)\
+            .join(Shortdesc).filter(Shortdesc.id == Change.shortdescs_id)\
+            .join(ActivityTest).filter(Change.activity_test_id==ActivityTest.id)\
+            .join(Project).filter(ActivityTest.project_id == Project.id)\
+            .join(Image).filter(Change.id == Image.change_id)\
+            .join(User).filter(Change.user_id == User.id)\
+            .order_by(-Change.time).all()
+
+    mail = []
+    [mail.append(MailInfo(x.description, x.shortdescs[0].name, x.activity_test.project.name,
+                          x.activity_test.name, x.user.email, x.activity_test.project.id)) for x in list]
+
+    def getKey(custom):
+        return custom.project_id
+
+    mail = sorted(mail, key=getKey)
+
+    id = mail[0].project_id
+    infoAll = []
+    for x in mail:
+        if id == x.project_id:
+            manager = db.session.query(User).join(User.projects_manager).filter(Project.id == id).all()
+            managerList = []
+            info = []
+            for m in manager:
+                managerList.append(m.email)
+
+            info.append(x.desc)
+            info.append(x.shortdesc)
+            info.append(x.project_name)
+            info.append(x.activity)
+            info.append(str(x.user).split('@', 1)[0])
+            infoAll.append(info)
+        else:
+            for m in managerList:
+                senMail(m, infoAll)
+            id = x.project_id
+            infoAll = []
+
+    for m in managerList:
+        senMail(m, infoAll)
+
 
     if is_ajax:
         return ajax_response(True, upload_key)
