@@ -158,6 +158,27 @@
                 <div class="col-md-12 text-center">
                     <h2>{{info.text}}</h2>
                     <p>{{info.description}}</p>
+
+                    {% if info.text == "84.211" %}
+                    <p><b>*** Spesiell beskrivelse ***</b></p>
+                    <p>Gjelder fundamenter, gulv, avlastningsplater, innside av landkar, vinger
+                    og skjørt, bakside av vegger i dagen, begge sider av vegger i tunnel og
+                    sidekanter av bruplate i avløpstunnel.</p>
+                    <br>
+                    <p>Omfatter ogå tilleggskostnader for tilpasning til berg, overgangskonstruksjoner,
+                    tverrsnittsvariasjoner og ensidig forskaling av fundamenter, gulv, bærebjelker,
+                    avlastningsplater og bruplate i avløpstunnel.</p>
+                    {% endif %}
+
+                    {% if info.text == "84.31 " %}
+                    <p><b>*** Spesiell beskrivelse ***</b></p>
+                    <p>Omfatter ferdig bundet armering av kamstål med stålklasse B500NC i
+                    henhold til NS 3576-3, og stangdiameter som angitt, ekskl. ev.
+                    lengdetillegg som inngår i prosess 84.351</p>
+                    <br>
+                    <p>Som prosess 84.3. Nominelle vekter etter NS 3576-3. Enhet: tonn</p>
+                    {% endif %}
+
                     <hr>
                     <br>
                     <form id="upload-form" action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
@@ -175,7 +196,7 @@
                             <!--<i class="fa fa-camera-retro fa-5x"></i> Custom Upload-->
                             <!--</label>-->
                             <input id="file-picker" name="file" accept="image/*" type="file"
-                                   class="filestyle form-control" data-input="false"
+                                   class="filestyle form-control" data-buttonBefore="true"
                                    data-buttonText="Velg bilde for opplasting" multiple required>
                             <br>
                             <!--<div class="red"><h1 class="white text-center"><i class="fa fa-minus"></i></h1></div>-->
@@ -184,10 +205,14 @@
                             <p><br/>
                         </div>
                         <div class="col-md-12">
-                            <button type="submit" class="ladda-button" data-color="blue" data-size="Extra Large"
-                                    data-style="slide-up">
+                            <button type="submit" class="ladda-button" data-color="blue"
+                                    data-style="slide-up" style="width:100%">
                                 <span>Lagre endringer</span>
                             </button>
+                            <br>
+                            <br>
+                            <br>
+
                         </div>
                     </form>
                 </div>
