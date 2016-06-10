@@ -1,9 +1,7 @@
-#-*- coding: utf-8 -*-
 from flask import render_template, request, url_for, redirect, g, flash, session, Flask, jsonify
 from flask.ext.security import current_user, login_required, roles_required, roles_accepted, utils
 from flask_mail import Mail, Message
 from uuid import uuid4
-from django.utils.encoding import smart_str, smart_unicode
 import random, string, hashlib, os, json, glob, ast, MySQLdb
 from __init__ import app, db, mail
 from admin import *
