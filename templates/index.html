@@ -164,7 +164,7 @@
                         <div class="col-md-12">
                             <input type="hidden" name="activity_id" value={{info.id}}>
                             <!--<div class="blue"><h1 class="white text-center"><i class="fa fa-plus"></i></h1></div>-->
-                            <select class="form-control" name="short_desc">
+                            <select class="form-control" name="short_desc" required>
                                 <option value="" disabled selected>Hva omfatter endringen?</option>
                                 {% for x in shortlist %}
                                 <option value="{{x.id}}">{{x.name}}</option>
@@ -176,7 +176,7 @@
                             <!--</label>-->
                             <input id="file-picker" name="file" accept="image/*" type="file"
                                    class="filestyle form-control" data-input="false"
-                                   data-buttonText="Velg bilde for opplasting" multiple>
+                                   data-buttonText="Velg bilde for opplasting" multiple required>
                             <br>
                             <!--<div class="red"><h1 class="white text-center"><i class="fa fa-minus"></i></h1></div>-->
                             <textarea class="form-control" rows="4" cols="40" name="textarea"

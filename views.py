@@ -1,7 +1,9 @@
+#-*- coding: utf-8 -*-
 from flask import render_template, request, url_for, redirect, g, flash, session, Flask, jsonify
 from flask.ext.security import current_user, login_required, roles_required, roles_accepted, utils
 from flask_mail import Mail, Message
 from uuid import uuid4
+from django.utils.encoding import smart_str, smart_unicode
 import random, string, hashlib, os, json, glob, ast, MySQLdb
 from __init__ import app, db, mail
 from admin import *
@@ -75,7 +77,6 @@ def set_new_password():
 @app.route('/activities')
 @roles_accepted('end-user', 'admin')
 def activities():
-
     project = request.args.get('project')
     project_id = request.args.get('project_id')
     user_id = current_user.id
@@ -139,10 +140,12 @@ def index():
             self.isFolder = isFolder
             self.description = description
 
+    for x in activity_list:
+        print x.processcode.name
 
     children = []
     [children.append(Children(x.name, x.id, x.project_id, x.parent_id, 0, 1, '')) for x in folder_list]
-    [children.append(Children(x.name, x.id, x.project_id, x.folder_id, 1, 0, str(x.processcode.name + ' - ' + x.quantity+' '+ x.unit.name))) for x in activity_list]
+    [children.append(Children(x.name, x.id, x.project_id, x.folder_id, 1, 0, x.processcode.name + ' - ' + x.quantity + ' ' + x.unit.name)) for x in activity_list]
     [children.append(Children(x.name, x.id, 'Root', 0, 0, 0, x.description)) for x in project_list]
 
     root_nodes = {x for x in children if x.project_id == 0}
@@ -191,7 +194,7 @@ def index():
             try:
                 getNodes(node)
             except:
-                print 'no nodes'
+                print ''
 
 
     #print len(tree['nodes'])
@@ -261,6 +264,7 @@ def upload():
     text = form.get('textarea')
     sd_id = form.get('short_desc')
     shortdesc = db.session.query(Shortdesc).filter(Shortdesc.id == sd_id).all()
+
     mod = Change(description=text, activity_test_id=activity_id, shortdescs_id=shortdesc[0].id, user_id=current_user.id)
     mod.shortdescs = shortdesc
     db.session.add(mod)
