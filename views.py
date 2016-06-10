@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from flask import render_template, request, url_for, redirect, g, flash, session, Flask, jsonify
 from flask.ext.security import current_user, login_required, roles_required, roles_accepted, utils
 from flask_mail import Mail, Message
