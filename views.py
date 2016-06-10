@@ -140,9 +140,6 @@ def index():
             self.isFolder = isFolder
             self.description = description
 
-    for x in activity_list:
-        print x.processcode.name
-
     children = []
     [children.append(Children(x.name, x.id, x.project_id, x.parent_id, 0, 1, '')) for x in folder_list]
     [children.append(Children(x.name, x.id, x.project_id, x.folder_id, 1, 0, x.processcode.name + ' - ' + x.quantity + ' ' + x.unit.name)) for x in activity_list]
