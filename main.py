@@ -1,6 +1,7 @@
 from flask.ext.security import current_user, login_required, roles_required, roles_accepted, RoleMixin, Security, \
     SQLAlchemyUserDatastore, UserMixin, utils
 
+
 from __init__ import app, db
 from models import *
 

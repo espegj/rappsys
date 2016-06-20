@@ -1,17 +1,63 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container">
-    <div class="row content">
-    <div class="col-md-12">
-    <h1>Welcome {{ current_user.email }}!</h1><br />
-    If you're seeing this page, you must be logged in.<br />
-    <br />
-    If you're an administrator, you can click <a href="admin">here</a> to administer Users and Roles.<br />
-    <br />
-    <a href="projects">Se dine prosjekter</a><br/>
-    <br />
-    Click <a href="/logout">here</a> to log out.<br />
+<script src="/static/js/jsonTest.js"></script>
+<link href="/static/css/folder.css" rel="stylesheet" type="text/css">
+
+
+<div class="container content">
+    <div class="row">
+        <div class="col-md-4 text-center">
+                <br>
+                <a href="#" style="color:black;" onclick="home()"><i class="fa fa-home fa-2x" aria-hidden="true">Hjem</i></a>
+            </div>
+        <div class="col-md-4 text-center">
+            <input name="filter" class="search form-control" id="search" value="" placeholder="Søk...">
         </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div id="path"></div>
+            <div id="data2"></div>
+            <div id="data"></div>
+            <div id="postPage" class="text-center">
+                    <h2>info</h2>
+                    <p>description</p>
+                    <hr>
+                    <br>
+
+                <form id="upload-form" action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
+                        <div class="col-md-12">
+                            <input id="activityInput" type="hidden" name="activity_id" value=id>
+                            <select class="form-control" name="short_desc" required>
+                                <option value="" disabled selected>Hva omfatter endringen?</option>
+                                {% for x in shortlist %}
+                                <option value="{{x.id}}">{{x.name}}</option>
+                                {% endfor %}
+                            </select>
+                            <br>
+                            <input id="file-picker" name="file" accept="image/*" type="file"
+                                   class="filestyle form-control" data-buttonBefore="true"
+                                   data-buttonText="Velg bilde for opplasting" multiple required>
+                            <br>
+                            <textarea class="form-control" rows="4" cols="40" name="textarea"
+                                      placeholder="Eventuell kort forklaring..."></textarea>
+                            <br/>
+                        </div>
+                        <div class="col-md-12">
+                            <button type="submit" class="ladda-button" data-color="blue"
+                                    data-style="slide-up" style="width:100%">
+                                <span>Lagre endringer</span>
+                            </button>
+                            <br>
+                            <br>
+                            <br>
+                        </div>
+                    </form>
+                </div>
         </div>
+    </div>
 </div>
+<script src="/static/js/uploadr.js" type="text/javascript"></script>
+<script src="/static/js/upload-alert.js" type="text/javascript"></script>
 {% endblock %}

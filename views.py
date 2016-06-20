@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from flask import render_template, request, url_for, redirect, g, flash, session, Flask, jsonify
+from flask import render_template, request, url_for, redirect, g, flash, session, jsonify
 from flask.ext.security import current_user, login_required, roles_required, roles_accepted, utils
 from flask_mail import Mail, Message
 from uuid import uuid4
@@ -9,9 +9,68 @@ from admin import *
 from sendMail import *
 
 
-@app.route('/test')
-# @roles_accepted('end-user', 'admin')
-def test():
+def sendMail():
+    class MailInfo(object):
+        def __init__(self, desc=None, shortdesc=None, project_name=None, activity=None, user=None, project_id=None):
+            self.desc = desc
+            self.shortdesc = shortdesc
+            self.project_name = project_name
+            self.activity = activity
+            self.user = user
+            self.project_id = project_id
+
+
+    #Mail to manager
+    list = db.session.query(Change)\
+            .join(Shortdesc).filter(Shortdesc.id == Change.shortdescs_id)\
+            .join(ActivityTest).filter(Change.activity_test_id==ActivityTest.id)\
+            .join(Project).filter(ActivityTest.project_id == Project.id)\
+            .join(Image).filter(Change.id == Image.change_id)\
+            .join(User).filter(Change.user_id == User.id)\
+            .order_by(-Change.time).all()
+
+    mail = []
+    [mail.append(MailInfo(x.description, x.shortdescs[0].name, x.activity_test.project.name,
+                          x.activity_test.name, x.user.email, x.activity_test.project.id)) for x in list]
+
+
+    def getKey(custom):
+        return custom.project_id
+
+    mail = sorted(mail, key=getKey)
+
+    id = mail[0].project_id
+    infoAll = []
+    for x in mail:
+        if id == x.project_id:
+            manager = db.session.query(User).join(User.projects_manager).filter(Project.id == id).all()
+            managerList = []
+            info = []
+            for m in manager:
+                managerList.append(m.email)
+
+            info.append(x.desc)
+            info.append(x.shortdesc)
+            info.append(x.project_name)
+            info.append(x.activity)
+            info.append(x.user)
+            infoAll.append(info)
+        else:
+            for m in managerList:
+                senMail(m, infoAll)
+            id = x.project_id
+            infoAll = []
+            info = []
+            info.append(x.desc)
+            info.append(x.shortdesc)
+            info.append(x.project_name)
+            info.append(x.activity)
+            info.append(x.user)
+            infoAll.append(info)
+
+    for m in managerList:
+        senMail(m, infoAll)
+
     return 'Mail sendt'
 
 
@@ -98,6 +157,83 @@ def projects():
     user_id = current_user.id
     project_list = db.session.query(Project).join(User.projects).filter(User.id == user_id).all()
     return render_template("projects.html", project_list=project_list)
+
+@app.route('/test')
+@roles_accepted('end-user', 'admin')
+def test():
+    shortdesc_list = db.session.query(Shortdesc).all()
+    return render_template("index1.html", shortlist=shortdesc_list)
+
+@app.route('/getJson')
+@roles_accepted('end-user', 'admin')
+def getJson():
+    user_id = current_user.id
+    project_list = db.session.query(Project).join(User.projects).filter(User.id == user_id).all()
+
+    folder_id_list = [id.id for id in project_list]
+    folder_list = []
+    for x in folder_id_list:
+        folder_list.extend(db.session.query(Folder).filter(Folder.project_id == x).all())
+
+    activity_list = []
+    for x in folder_id_list:
+        activity_list.extend(db.session.query(ActivityTest).join(User.activities).filter(User.id == user_id).\
+        filter(ActivityTest.project_id == x).join(ActivityTest.processcode).filter(ProcessCode.id == ActivityTest.name).\
+        join(ActivityTest.unit).filter(ActivityTest.unit_id == Unit.id).all())
+        # activity_list.extend(db.session.query(ActivityTest).filter(ActivityTest.project_id == x).all())
+
+    class Children(object):
+        def __init__(self, name=None, id=None, project_id=None, parent_id=None, isActivity=None, isFolder=None, description=None):
+            self.name = name
+            self.id = id
+            self.project_id = project_id
+            self.parent_id = parent_id
+            self.isActivity = isActivity
+            self.isFolder = isFolder
+            self.description = description
+
+    children = []
+    [children.append(Children(x.name, x.id, x.project_id, x.parent_id, 0, 1, '')) for x in folder_list]
+    [children.append(Children(x.name, x.id, x.project_id, x.folder_id, 1, 0, x.processcode.name + ' - ' + x.quantity + ' ' + x.unit.name)) for x in activity_list]
+    [children.append(Children(x.name, x.id, 'Root', 0, 0, 0, x.description)) for x in project_list]
+
+    root_nodes = {x for x in children if x.project_id == 0}
+    links = []
+    for node in root_nodes:
+        links.append(("Root", node.id))
+
+    def get_nodes(node):
+        d = {}
+        if node == "Root":
+            d["text"] = node
+        else:
+            d["text"] = node.name
+            d["isActivity"] = node.isActivity
+            d["isFolder"] = node.isFolder
+            d["description"] = node.description
+            d["id"] = node.id
+
+        getchildren = get_children(node)
+        if getchildren:
+            d["nodes"] = [get_nodes(child) for child in getchildren]
+        return d
+
+    def get_children(node):
+        if node == 'Root':
+            return [x for x in children if x.project_id == node]
+        elif node.parent_id == 0 and node.isActivity == 0:
+            return [x for x in children if x.project_id == node.id and x.parent_id == None]
+        else:
+            if node.isActivity == 0:
+                return [x for x in children if x.parent_id == node.id]
+
+    #tree = get_nodes("Root")
+    try:
+        tree2 = get_nodes("Root")
+    except:
+        return "Ingen elementer"
+
+    return jsonify(tree2)
 
 
 @app.route('/activity')
@@ -275,60 +411,6 @@ def upload():
         db.session.add(img)
 
     db.session.commit()
-
-    class MailInfo(object):
-        def __init__(self, desc=None, shortdesc=None, project_name=None, activity=None, user=None, project_id=None):
-            self.desc = desc
-            self.shortdesc = shortdesc
-            self.project_name = project_name
-            self.activity = activity
-            self.user = user
-            self.project_id = project_id
-
-
-    #Mail to manager
-    list = db.session.query(Change)\
-            .join(Shortdesc).filter(Shortdesc.id == Change.shortdescs_id)\
-            .join(ActivityTest).filter(Change.activity_test_id==ActivityTest.id)\
-            .join(Project).filter(ActivityTest.project_id == Project.id)\
-            .join(Image).filter(Change.id == Image.change_id)\
-            .join(User).filter(Change.user_id == User.id)\
-            .order_by(-Change.time).all()
-
-    mail = []
-    [mail.append(MailInfo(x.description, x.shortdescs[0].name, x.activity_test.project.name,
-                          x.activity_test.name, x.user.email, x.activity_test.project.id)) for x in list]
-
-    def getKey(custom):
-        return custom.project_id
-
-    mail = sorted(mail, key=getKey)
-
-    id = mail[0].project_id
-    infoAll = []
-    for x in mail:
-        if id == x.project_id:
-            manager = db.session.query(User).join(User.projects_manager).filter(Project.id == id).all()
-            managerList = []
-            info = []
-            for m in manager:
-                managerList.append(m.email)
-
-            info.append(x.desc)
-            info.append(x.shortdesc)
-            info.append(x.project_name)
-            info.append(x.activity)
-            info.append(str(x.user).split('@', 1)[0])
-            infoAll.append(info)
-        else:
-            for m in managerList:
-                senMail(m, infoAll)
-            id = x.project_id
-            infoAll = []
-
-    for m in managerList:
-        senMail(m, infoAll)
-
 
     if is_ajax:
         return ajax_response(True, upload_key)
