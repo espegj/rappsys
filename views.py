@@ -170,7 +170,6 @@ def index():
     return render_template("index.html", shortlist=shortdesc_list, admin=admin)
 
 @app.route('/getJson')
-@roles_accepted('end-user', 'admin')
 def getJson():
     user_id = current_user.id
     project_list = db.session.query(Project).join(User.projects).filter(User.id == user_id).all()
