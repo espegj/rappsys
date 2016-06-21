@@ -3,6 +3,7 @@ $("document").ready(function () {
     var postPage = $("#postPage").hide();
     var dataPage = $("#data").show();
     var data2Page = $("#data2").show();
+    var parent;
 
     var element;
     function findElement(source, id, isFolder, isActivity)
@@ -33,6 +34,46 @@ $("document").ready(function () {
             }
         }
 
+
+    var parent;
+    var parentList=[];
+    var check = false;
+    function getProject(source, id, isFolder, isActivity)
+        {
+            for (key in source)
+            {
+                if (check){
+                    parent = parentList[parentList.length - 1];
+                    alert(parent.text);
+                }
+
+
+                check=false;
+                var item = source[key];
+                if(item[0]){
+                    if(item[0].isFolder || item[0].isActivity){
+                        if(item[0].id==id && item[0].isFolder==isFolder && item[0].isActivity==isActivity){
+                            check=true;
+                            }
+                    }
+                }
+                else{
+                    if(item.isFolder || item.isActivity){
+                        if(item.id==id && item.isFolder==isFolder && item.isActivity==isActivity){
+                            check=true;
+                            }
+                    }
+                }
+                if (item[1])
+                {
+                    parentList.push(item[0]);
+                    getProject(item[1], id, isFolder, isActivity);
+                }
+                else{
+                    getProject(item.nodes, id, isFolder, isActivity);
+                }
+            }
+        }
 
     function findColor(data){
         if(data.isFolder)
@@ -103,6 +144,7 @@ $("document").ready(function () {
             }
         }
 
+
     $.each( data.nodes, function( val ) {
             $( "#data" ).append( "<div class='test blue list-group-item li el el3' id='"+data.nodes[val].id+"' onclick=getNodes("+data.nodes[val].id+","+data.nodes[val].isFolder+","+data.nodes[val].isActivity+");>"
                             +"<div class='row'>"
@@ -116,11 +158,23 @@ $("document").ready(function () {
                             +"</div>"
                         +"</div>"
                     +"</div>" );
-        });
+    });
 
-    getNodes = function getNodes(id, isFolder, isActivity){
+
+    getNodes = function getNodes(id, isFolder, isActivity, back){
         $("#data2").empty().show();
         dataPage.hide();
+        if(parent==="project" && back==1){
+            $('.el').show();
+            $('.el2').hide();
+            home();
+        }
+        parent = getParent(id,isFolder,isActivity);
+        postPage.hide();
+        postPage.hide();
+        $("#search").show();
+        $('#search').val('');
+        $("#back").attr('onclick', 'getNodes('+parent.id+','+parent.isFolder+','+parent.isActivity+',1)');
         if (isActivity){
             postPage.show();
             data2Page.hide();
@@ -237,6 +291,44 @@ $("document").ready(function () {
         dataPage = $("#data").show();
         data2Page = $("#data2").hide();
         $("#search").show();
+        $('.el').show();
+        $('.el2').hide();
+    }
+
+    back = function(id, isFolder, isActivity){
+        getProject(items, id, isFolder, isActivity);
+        //getNodes(id, isFolder, isActivity);
+    }
+    var result = [];
+    function setChildParent(source){
+        for (key in source){
+            var item = source[key];
+            result.push({ parent: item, child: item.nodes});
+            if(item.nodes){
+                setChildParent(item.nodes);
+            }
+        }
+    }
+    setChildParent(data.nodes);
+
+    function getParent(id, isFolder, isActivity){
+        var project=true;
+        for (key in result){
+            if(result[key].child){
+                for (v in result[key].child){
+                    //alert(result[key].child[v].text);
+                    if (result[key].child[v].id==id && result[key].child[v].isFolder==isFolder && result[key].child[v].isActivity==isActivity){
+                        //alert(result[key].parent.text);
+                        return result[key].parent;
+                        project=false;
+                    }
+                }
+            }
+        }
+        if (project){
+            return "project";
+        }
+
     }
 
     });
