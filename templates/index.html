@@ -6,8 +6,16 @@
 
 <div class="container content">
     <div class="row text-center">
+        {{ current_user.email }}
+        {% if admin %}
+            <a href="/admin">Kontrollpanel</a>
+        {% endif %}
+
+    </div>
+    <div class="row text-center">
                 <br>
                 <div class="col-xs-6">
+                    <a id="logOut" href="/logout" style="color:black;"><i class="fa fa-sign-out fa-2x" aria-hidden="true"> Logg ut</i></a>
                     <a id="back" href="#" style="color:black;"><i class="fa fa-chevron-left fa-2x" aria-hidden="true"> Tilbake</i></a>
                 </div>
                 <div class="col-xs-6">

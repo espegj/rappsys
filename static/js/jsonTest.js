@@ -3,6 +3,8 @@ $("document").ready(function () {
     var postPage = $("#postPage").hide();
     var dataPage = $("#data").show();
     var data2Page = $("#data2").show();
+    var backButton = $("#back").hide();
+    var logOut = $("#logOut");
     var parent;
 
     var element;
@@ -164,6 +166,8 @@ $("document").ready(function () {
     getNodes = function getNodes(id, isFolder, isActivity, back){
         $("#data2").empty().show();
         dataPage.hide();
+        backButton.show();
+        logOut.hide();
         if(parent==="project" && back==1){
             $('.el').show();
             $('.el2').hide();
@@ -293,6 +297,8 @@ $("document").ready(function () {
         $("#search").show();
         $('.el').show();
         $('.el2').hide();
+        backButton.hide();
+        logOut.show();
     }
 
     back = function(id, isFolder, isActivity){

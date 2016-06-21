@@ -164,7 +164,10 @@ def projects():
 @login_required
 def index():
     shortdesc_list = db.session.query(Shortdesc).all()
-    return render_template("index.html", shortlist=shortdesc_list)
+    admin = False
+    if(current_user.has_role('admin')):
+        admin=True
+    return render_template("index.html", shortlist=shortdesc_list, admin=admin)
 
 @app.route('/getJson')
 @roles_accepted('end-user', 'admin')
