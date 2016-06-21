@@ -352,9 +352,9 @@ def index2():
         p = ast.literal_eval(struct)
 
         if p['isActivity'] == 1:
-            return render_template("index.html", back="true", all=listall, info=p, shortlist=shortdesc_list)
+            return render_template("index2.html", back="true", all=listall, info=p, shortlist=shortdesc_list)
         else:
-            return render_template("index.html", data=p, back="true", all=listall)
+            return render_template("index2.html", data=p, back="true", all=listall)
     except:
         print ''
 
