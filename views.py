@@ -158,11 +158,13 @@ def projects():
     project_list = db.session.query(Project).join(User.projects).filter(User.id == user_id).all()
     return render_template("projects.html", project_list=project_list)
 
-@app.route('/test')
+# Displays the home page.
+@app.route('/')
+@app.route('/index')
 @roles_accepted('end-user', 'admin')
-def test():
+def index():
     shortdesc_list = db.session.query(Shortdesc).all()
-    return render_template("index1.html", shortlist=shortdesc_list)
+    return render_template("index.html", shortlist=shortdesc_list)
 
 @app.route('/getJson')
 @roles_accepted('end-user', 'admin')
@@ -244,12 +246,10 @@ def activity():
     return render_template("activity.html", activity=activity, activity_id=activity_id)
 
 
-# Displays the home page.
-@app.route('/')
-@app.route('/index', methods=['GET', 'POST'])
+@app.route('/index2', methods=['GET', 'POST'])
 @login_required
 # @roles_accepted('end-user', 'admin')
-def index():
+def index2():
     user_id = current_user.id
     project_list = db.session.query(Project).join(User.projects).filter(User.id == user_id).all()
 
@@ -314,7 +314,7 @@ def index():
     try:
         tree2 = get_nodes("Root")
     except:
-        return render_template("index.html", empty=True)
+        return render_template("index2.html", empty=True)
 
     #print tree['nodes'][0]
 
@@ -343,7 +343,7 @@ def index():
     try:
         getNodes(tree2)
     except:
-        return render_template("index.html", empty=True)
+        return render_template("index2.html", empty=True)
 
     shortdesc_list = db.session.query(Shortdesc).all()
 
@@ -358,7 +358,7 @@ def index():
     except:
         print ''
 
-    return render_template("index.html", data=tree2, all=listall)
+    return render_template("index2.html", data=tree2, all=listall)
 
 
 @app.route('/change')
@@ -416,7 +416,8 @@ def upload():
         return ajax_response(True, upload_key)
     else:
         return redirect(url_for("upload_complete", uuid=upload_key))
-    return redirect("javascript:history.back()")
+    shortdesc_list = db.session.query(Shortdesc).all()
+    return render_template("index.html", shortlist=shortdesc_list)
 
 @app.route("/files/<uuid>")
 def upload_complete(uuid):
