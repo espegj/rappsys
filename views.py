@@ -160,8 +160,8 @@ def projects():
 
 # Displays the home page.
 @app.route('/')
-@app.route('/index')
-@roles_accepted('end-user', 'admin')
+@app.route('/index', methods=['GET', 'POST'])
+@login_required
 def index():
     shortdesc_list = db.session.query(Shortdesc).all()
     return render_template("index.html", shortlist=shortdesc_list)
@@ -245,7 +245,7 @@ def activity():
     activity_id = request.args.get('activity_id')
     return render_template("activity.html", activity=activity, activity_id=activity_id)
 
-
+'''
 @app.route('/index2', methods=['GET', 'POST'])
 @login_required
 # @roles_accepted('end-user', 'admin')
@@ -359,7 +359,7 @@ def index2():
         print ''
 
     return render_template("index2.html", data=tree2, all=listall)
-
+'''
 
 @app.route('/change')
 @roles_accepted('end-user', 'admin')
